@@ -1,0 +1,363 @@
+const label = (ru, en, kz) => ({ ru, en, kz })
+
+export const CATEGORY_OPTIONS = [
+  { id: 'marketplace', labels: label('Маркетплейс', 'Marketplace', 'Маркетплейс') },
+  { id: 'store', labels: label('Магазин', 'Store', 'Дүкен') },
+  { id: 'cafe', labels: label('Кафе / ресторан', 'Cafe / Restaurant', 'Кафе / мейрамхана') },
+  { id: 'service', labels: label('Услуга', 'Service', 'Қызмет') },
+]
+
+export const MARKETPLACES = [
+  { id: 'kaspi', labels: label('Kaspi', 'Kaspi', 'Kaspi') },
+  { id: 'wildberries', labels: label('Wildberries', 'Wildberries', 'Wildberries') },
+  { id: 'ozon', labels: label('Ozon', 'Ozon', 'Ozon') },
+  { id: 'amazon', labels: label('Amazon', 'Amazon', 'Amazon') },
+  { id: 'aliexpress', labels: label('AliExpress', 'AliExpress', 'AliExpress') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const STORE_PLACES = [
+  { id: 'electronics_store', labels: label('Магазин электроники', 'Electronics store', 'Электроника дүкені') },
+  { id: 'clothing_store', labels: label('Магазин одежды', 'Clothing store', 'Киім дүкені') },
+  { id: 'shoe_store', labels: label('Магазин обуви', 'Shoe store', 'Аяқ киім дүкені') },
+  { id: 'cosmetics_store', labels: label('Косметический магазин', 'Cosmetics store', 'Косметика дүкені') },
+  { id: 'grocery_store', labels: label('Продуктовый магазин', 'Grocery store', 'Азық-түлік дүкені') },
+  { id: 'bookstore', labels: label('Книжный магазин', 'Bookstore', 'Кітап дүкені') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const CAFE_PLACES = [
+  { id: 'coffee_shop', labels: label('Кофейня', 'Coffee shop', 'Кофехана') },
+  { id: 'cafe', labels: label('Кафе', 'Cafe', 'Кафе') },
+  { id: 'restaurant', labels: label('Ресторан', 'Restaurant', 'Мейрамхана') },
+  { id: 'pizzeria', labels: label('Пиццерия', 'Pizzeria', 'Пиццерия') },
+  { id: 'bakery', labels: label('Пекарня', 'Bakery', 'Наубайхана') },
+  { id: 'fast_food', labels: label('Фастфуд', 'Fast food', 'Фастфуд') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const SERVICE_PLACES = [
+  { id: 'delivery_service', labels: label('Доставка', 'Delivery', 'Жеткізу') },
+  { id: 'beauty_salon', labels: label('Салон красоты', 'Beauty salon', 'Сұлулық салоны') },
+  { id: 'education_course', labels: label('Образовательный курс', 'Education course', 'Оқу курсы') },
+  { id: 'repair_service', labels: label('Ремонт', 'Repair service', 'Жөндеу қызметі') },
+  { id: 'fitness_center', labels: label('Фитнес-центр', 'Fitness center', 'Фитнес орталығы') },
+  { id: 'barber_shop', labels: label('Барбершоп', 'Barber shop', 'Барбершоп') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const MARKETPLACE_PRODUCTS = [
+  { id: 'wireless_headphones', labels: label('Беспроводные наушники', 'Wireless headphones', 'Сымсыз құлаққап') },
+  { id: 'power_bank', labels: label('Пауэрбанк', 'Power bank', 'Пауэрбанк') },
+  { id: 'hoodie', labels: label('Худи', 'Hoodie', 'Худи') },
+  { id: 'backpack', labels: label('Рюкзак', 'Backpack', 'Рюкзак') },
+  { id: 'sneakers', labels: label('Кроссовки', 'Sneakers', 'Кроссовки') },
+  { id: 'phone_case', labels: label('Чехол для телефона', 'Phone case', 'Телефон қаптамасы') },
+  { id: 'smart_watch', labels: label('Смарт-часы', 'Smart watch', 'Смарт-сағат') },
+  { id: 'laptop_stand', labels: label('Подставка для ноутбука', 'Laptop stand', 'Ноутбук тіреуіші') },
+  { id: 'water_bottle', labels: label('Бутылка для воды', 'Water bottle', 'Су бөтелкесі') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const STORE_PRODUCTS = [
+  { id: 'clothes', labels: label('Одежда', 'Clothes', 'Киім') },
+  { id: 'shoes', labels: label('Обувь', 'Shoes', 'Аяқ киім') },
+  { id: 'electronics', labels: label('Электроника', 'Electronics', 'Электроника') },
+  { id: 'cosmetics', labels: label('Косметика', 'Cosmetics', 'Косметика') },
+  { id: 'accessories', labels: label('Аксессуары', 'Accessories', 'Аксессуарлар') },
+  { id: 'bag', labels: label('Сумка', 'Bag', 'Сөмке') },
+  { id: 'perfume', labels: label('Парфюм', 'Perfume', 'Парфюм') },
+  { id: 'phone_case', labels: label('Чехол для телефона', 'Phone case', 'Телефон қаптамасы') },
+  { id: 'stationery', labels: label('Канцтовары', 'Stationery', 'Кеңсе тауарлары') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const CAFE_ITEMS = [
+  { id: 'coffee', labels: label('Кофе', 'Coffee', 'Кофе') },
+  { id: 'tea', labels: label('Чай', 'Tea', 'Шай') },
+  { id: 'burger', labels: label('Бургер', 'Burger', 'Бургер') },
+  { id: 'pizza', labels: label('Пицца', 'Pizza', 'Пицца') },
+  { id: 'dessert', labels: label('Десерт', 'Dessert', 'Десерт') },
+  { id: 'breakfast', labels: label('Завтрак', 'Breakfast', 'Таңғы ас') },
+  { id: 'salad', labels: label('Салат', 'Salad', 'Салат') },
+  { id: 'pasta', labels: label('Паста', 'Pasta', 'Паста') },
+  { id: 'milk_tea', labels: label('Милк-ти', 'Milk tea', 'Милк-ти') },
+  { id: 'sandwich', labels: label('Сэндвич', 'Sandwich', 'Сэндвич') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const SERVICE_TYPES = [
+  { id: 'delivery', labels: label('Доставка', 'Delivery', 'Жеткізу') },
+  { id: 'beauty', labels: label('Красота', 'Beauty', 'Сұлулық') },
+  { id: 'education', labels: label('Образование', 'Education', 'Білім') },
+  { id: 'repair', labels: label('Ремонт', 'Repair', 'Жөндеу') },
+  { id: 'fitness', labels: label('Фитнес', 'Fitness', 'Фитнес') },
+  { id: 'cleaning', labels: label('Уборка', 'Cleaning', 'Тазалау') },
+  { id: 'barber_shop', labels: label('Барбершоп', 'Barber shop', 'Барбершоп') },
+  { id: 'tutoring', labels: label('Репетиторство', 'Tutoring', 'Репетиторлық') },
+  { id: 'printing', labels: label('Печать', 'Printing', 'Басып шығару') },
+  { id: 'other', labels: label('Другое', 'Other', 'Басқа') },
+]
+
+export const RECENT_REVIEW_SEEDS = [
+  {
+    id: 'seed-ayan-1',
+    authorFirstName: 'Ayan',
+    authorLastName: 'Sabit',
+    category: 'marketplace',
+    placeId: 'ozon',
+    itemId: 'wireless_headphones',
+    rating: 4,
+    helpfulLikes: 12,
+    createdAt: '2026-05-02T10:20:00.000Z',
+    text:
+      'I have been using these wireless headphones for 3 months every day. The sound is clear, the bass is good, and the battery lasts about 6-7 hours. The only minus is that the microphone is weak outside. I recommend them for students and daily use.',
+  },
+  {
+    id: 'seed-damir-1',
+    authorFirstName: 'Damir',
+    authorLastName: 'Torekhan',
+    category: 'store',
+    placeId: 'shoe_store',
+    itemId: 'sneakers',
+    rating: 3,
+    helpfulLikes: 8,
+    createdAt: '2026-05-04T08:15:00.000Z',
+    text:
+      'Ran 18 km across three sessions. Grip is solid and the foam feels light, but the toe box is narrow and my heel rubbed after 40 minutes. I recommend going half a size up.',
+  },
+  {
+    id: 'seed-aruzhan-1',
+    authorFirstName: 'Aruzhan',
+    authorLastName: 'Murat',
+    category: 'cafe',
+    placeId: 'coffee_shop',
+    itemId: 'coffee',
+    rating: 4,
+    helpfulLikes: 9,
+    createdAt: '2026-05-06T17:00:00.000Z',
+    text:
+      'Ordered cappuccino before work. Coffee taste is rich, milk foam is smooth, and staff served it in four minutes. The place is small, so it is better for takeaway than long meetings.',
+  },
+  {
+    id: 'seed-dias-1',
+    authorFirstName: 'Dias',
+    authorLastName: 'Omar',
+    category: 'service',
+    placeId: 'delivery_service',
+    itemId: 'delivery',
+    rating: 3,
+    helpfulLikes: 6,
+    createdAt: '2026-05-07T14:05:00.000Z',
+    text:
+      'Ordered delivery after work. The courier was polite and packaging was clean, but the order arrived 25 minutes late. Suitable when speed is not critical.',
+  },
+  {
+    id: 'seed-alina-1',
+    authorFirstName: 'Alina',
+    authorLastName: 'Kim',
+    category: 'marketplace',
+    placeId: 'wildberries',
+    itemId: 'hoodie',
+    rating: 5,
+    helpfulLikes: 5,
+    createdAt: '2026-05-08T09:30:00.000Z',
+    text:
+      'Fabric is soft, stitching is neat, and the color stayed rich after two washes. The fit is oversized, so choose a smaller size if you want a tighter look.',
+  },
+  {
+    id: 'seed-eldana-1',
+    authorFirstName: 'Eldana',
+    authorLastName: 'Rakhim',
+    category: 'marketplace',
+    placeId: 'kaspi',
+    itemId: 'power_bank',
+    rating: 4,
+    helpfulLikes: 14,
+    createdAt: '2026-05-08T13:20:00.000Z',
+    text:
+      'Bought this power bank for daily university use. It charges my phone almost twice and the size is comfortable, but the cable in the box is short. Good for travel and long classes.',
+  },
+  {
+    id: 'seed-aizere-1',
+    authorFirstName: 'Aizere',
+    authorLastName: 'Nurly',
+    category: 'marketplace',
+    placeId: 'aliexpress',
+    itemId: 'backpack',
+    rating: 4,
+    helpfulLikes: 11,
+    createdAt: '2026-05-08T15:05:00.000Z',
+    text:
+      'The backpack arrived after 16 days. Material feels stronger than expected and the laptop pocket is useful, but the side bottle pocket is small. Worth it if you can wait for delivery.',
+  },
+  {
+    id: 'seed-amir-1',
+    authorFirstName: 'Amir',
+    authorLastName: 'Kuat',
+    category: 'store',
+    placeId: 'electronics_store',
+    itemId: 'phone_case',
+    rating: 5,
+    helpfulLikes: 7,
+    createdAt: '2026-05-09T09:30:00.000Z',
+    text:
+      'Bought a phone case in the electronics store. It fits tightly, buttons press easily, and the material does not smell. Price is higher than online, but you can check the quality before buying.',
+  },
+  {
+    id: 'seed-nursultan-1',
+    authorFirstName: 'Nursultan',
+    authorLastName: 'Beks',
+    category: 'store',
+    placeId: 'clothing_store',
+    itemId: 'shoes',
+    rating: 3,
+    helpfulLikes: 6,
+    createdAt: '2026-05-09T10:10:00.000Z',
+    text:
+      'I tried the sneakers in the clothing store and walked in them for two days. Design is nice and they are light, but the heel is stiff. Good for short walks, not for long runs.',
+  },
+  {
+    id: 'seed-kamila-1',
+    authorFirstName: 'Kamila',
+    authorLastName: 'Serik',
+    category: 'store',
+    placeId: 'cosmetics_store',
+    itemId: 'cosmetics',
+    rating: 4,
+    helpfulLikes: 10,
+    createdAt: '2026-05-09T11:00:00.000Z',
+    text:
+      'Used the face cream for ten days. Texture is light, smell is pleasant, and it works under makeup. It may be too simple for very dry skin, but good for normal skin.',
+  },
+  {
+    id: 'seed-ilyas-1',
+    authorFirstName: 'Ilyas',
+    authorLastName: 'Madi',
+    category: 'store',
+    placeId: 'electronics_store',
+    itemId: 'backpack',
+    rating: 4,
+    helpfulLikes: 8,
+    createdAt: '2026-05-09T12:10:00.000Z',
+    text:
+      'Nice backpack for work. The zippers are smooth and the black design matches everything. I wish the straps had more padding, but for the price it is practical.',
+  },
+  {
+    id: 'seed-medina-1',
+    authorFirstName: 'Medina',
+    authorLastName: 'Ali',
+    category: 'cafe',
+    placeId: 'cafe',
+    itemId: 'burger',
+    rating: 3,
+    helpfulLikes: 5,
+    createdAt: '2026-05-09T12:40:00.000Z',
+    text:
+      'The burger was tasty and the portion was big, but the bun was too soft and fries arrived cold. I would order again only if eating inside the cafe.',
+  },
+  {
+    id: 'seed-miras-1',
+    authorFirstName: 'Miras',
+    authorLastName: 'Talgat',
+    category: 'cafe',
+    placeId: 'restaurant',
+    itemId: 'pizza',
+    rating: 4,
+    helpfulLikes: 13,
+    createdAt: '2026-05-09T13:00:00.000Z',
+    text:
+      'Pizza had enough cheese and the dough was thin. Delivery took 45 minutes, a bit longer than promised, but it arrived hot. Good option for a group dinner.',
+  },
+  {
+    id: 'seed-asel-1',
+    authorFirstName: 'Asel',
+    authorLastName: 'Marat',
+    category: 'cafe',
+    placeId: 'bakery',
+    itemId: 'dessert',
+    rating: 4,
+    helpfulLikes: 6,
+    createdAt: '2026-05-09T13:30:00.000Z',
+    text:
+      'Tried the chocolate dessert. Taste is rich and not too sweet, but the portion is small for the price. Good with tea if you want something light.',
+  },
+  {
+    id: 'seed-adil-1',
+    authorFirstName: 'Adil',
+    authorLastName: 'Yessen',
+    category: 'cafe',
+    placeId: 'fast_food',
+    itemId: 'milk_tea',
+    rating: 4,
+    helpfulLikes: 7,
+    createdAt: '2026-05-09T14:20:00.000Z',
+    text:
+      'Milk tea tasted fresh and the sugar level was exactly as requested. The queue was slow after school hours, so order ahead if you are in a hurry.',
+  },
+  {
+    id: 'seed-sanzhar-1',
+    authorFirstName: 'Sanzhar',
+    authorLastName: 'Ospan',
+    category: 'cafe',
+    placeId: 'coffee_shop',
+    itemId: 'breakfast',
+    rating: 5,
+    helpfulLikes: 4,
+    createdAt: '2026-05-09T14:55:00.000Z',
+    text:
+      'Breakfast pancakes were soft, warm, and served with enough berries. Coffee came later than the food, but staff apologized. Great place for a calm weekend morning.',
+  },
+  {
+    id: 'seed-tomiris-1',
+    authorFirstName: 'Tomiris',
+    authorLastName: 'Akhmet',
+    category: 'service',
+    placeId: 'beauty_salon',
+    itemId: 'beauty',
+    rating: 5,
+    helpfulLikes: 9,
+    createdAt: '2026-05-09T15:25:00.000Z',
+    text:
+      'Booked a manicure after reading reviews. The salon was clean, tools were opened in front of me, and the master explained each step. Price is not cheap, but the quality felt safe.',
+  },
+  {
+    id: 'seed-amina-1',
+    authorFirstName: 'Amina',
+    authorLastName: 'Sultan',
+    category: 'service',
+    placeId: 'education_course',
+    itemId: 'education',
+    rating: 4,
+    helpfulLikes: 10,
+    createdAt: '2026-05-09T16:00:00.000Z',
+    text:
+      'Took the JavaScript course for one month. Lessons were clear and homework feedback helped, but some videos are outdated. Good for beginners who need structure.',
+  },
+  {
+    id: 'seed-eldana-2',
+    authorFirstName: 'Eldana',
+    authorLastName: 'Rakhim',
+    category: 'service',
+    placeId: 'repair_service',
+    itemId: 'repair',
+    rating: 3,
+    helpfulLikes: 8,
+    createdAt: '2026-05-09T16:30:00.000Z',
+    text:
+      'They repaired my laptop fan in two days. The noise is gone and the price was explained before work, but communication was slow. I recommend calling instead of waiting for messages.',
+  },
+  {
+    id: 'seed-aizere-2',
+    authorFirstName: 'Aizere',
+    authorLastName: 'Nurly',
+    category: 'service',
+    placeId: 'fitness_center',
+    itemId: 'fitness',
+    rating: 4,
+    helpfulLikes: 12,
+    createdAt: '2026-05-09T17:10:00.000Z',
+    text:
+      'Used the fitness center for two weeks. Equipment is clean, trainers are polite, and evening classes are energetic. Locker room gets crowded after 7 pm, so morning is better.',
+  },
+]

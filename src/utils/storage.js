@@ -1,8 +1,8 @@
-import { SAMPLE_REVIEW_SEEDS } from '../data/sampleData'
+import { RECENT_REVIEW_SEEDS } from '../data/appData'
 import { createReviewRecord } from './reviewEngine'
 
 const PROFILE_KEY = 'review-booster.profile'
-const REVIEWS_KEY = 'review-booster.reviews.v3'
+const REVIEWS_KEY = 'review-booster.reviews.v4'
 const LIKED_REVIEWS_KEY = 'review-booster.likedReviews.v2'
 
 const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
@@ -24,7 +24,7 @@ const writeJson = (key, value) => {
 }
 
 export const buildSeedReviews = () =>
-  SAMPLE_REVIEW_SEEDS.map((seed) =>
+  RECENT_REVIEW_SEEDS.map((seed) =>
     createReviewRecord({
       ...seed,
       isSeed: true,

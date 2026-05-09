@@ -569,6 +569,21 @@ textarea:focus {
   font-size: 20px;
 }
 
+.modal-suggestions {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+.modal-suggestions span {
+  border-radius: 16px;
+  background: var(--soft);
+  color: var(--muted);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
 .screen-title {
   padding: 4px 2px;
 }

@@ -15,12 +15,15 @@ import {
 } from 'lucide-react'
 import {
   CAFE_ITEMS,
+  CAFE_PLACES,
   CATEGORY_OPTIONS,
   MARKETPLACE_PRODUCTS,
   MARKETPLACES,
+  SERVICE_PLACES,
   SERVICE_TYPES,
+  STORE_PLACES,
   STORE_PRODUCTS,
-} from './data/sampleData'
+} from './data/appData'
 import { createReviewRecord } from './utils/reviewEngine'
 import {
   clearProfile,
@@ -53,22 +56,14 @@ const copy = {
     profile: 'Профиль',
     hi: 'Привет',
     purchaseQuestion: 'Что вы приобрели?',
-    marketplace: 'Маркетплейс',
-    store: 'Магазин',
-    cafe: 'Кафе / ресторан',
-    service: 'Услуга',
-    selectMarketplace: 'Маркетплейс',
-    product: 'Товар',
-    storeName: 'Название магазина',
-    cafeName: 'Название кафе / ресторана',
-    serviceName: 'Название сервиса',
-    serviceType: 'Тип услуги',
-    orderedItem: 'Что заказали',
-    other: 'Другое',
-    writeProductName: 'Напишите название',
+    whereBought: 'Где вы это купили?',
+    chooseProduct: 'Выберите продукт',
+    writeOwnOption: 'Напишите свой вариант',
+    writeProductName: 'Напишите название продукта',
     writeReview: 'Напишите отзыв',
-    reviewPlaceholder: 'Опишите опыт: что понравилось, что можно улучшить, кому это подойдет.',
+    reviewPlaceholder: 'Опишите реальный опыт: срок использования, качество, цену, доставку, вкус, сервис или честный минус.',
     publishReview: 'Опубликовать отзыв',
+    yourRating: 'Ваша оценка',
     publishing: 'Публикуем отзыв',
     checking: 'Проверяем полезные детали',
     calculating: 'Считаем качество',
@@ -77,16 +72,14 @@ const copy = {
     scoreLine: 'Ваш отзыв получил',
     bonus: 'Бонус',
     coupon: 'Купон',
-    whyGood: 'Почему: есть опыт использования, конкретные детали и честная обратная связь.',
+    whyGood: 'Почему: отзыв содержит опыт использования, конкретные детали и полезную обратную связь.',
     lowResult: 'Отзыв опубликован, но бонус пока не разблокирован.',
-    improve: 'Добавьте больше деталей, чтобы сделать отзыв полезнее.',
+    improve: 'Добавьте больше конкретных деталей: срок использования, цену, качество, доставку, вкус, сервис или один честный минус.',
     goFeed: 'Перейти к отзывам',
     close: 'Закрыть',
-    recentReviews: 'Последние отзывы',
+    recentReviews: 'Недавние отзывы',
     helpful: 'Полезно',
     counted: 'Учтено',
-    qualityScore: 'Оценка качества',
-    bonusUnlocked: 'Бонус открыт',
     bonusLocked: 'Бонус пока не открыт',
     topReviewers: 'Лучшие авторы',
     thisMonth: 'За месяц',
@@ -96,12 +89,12 @@ const copy = {
     likes: 'Лайки',
     averageQuality: 'Среднее качество',
     level: 'Уровень',
-    beginner: 'Начинающий автор',
+    beginner: 'Новичок',
     trusted: 'Надежный автор',
     expert: 'Эксперт отзывов',
     legend: 'Легенда отзывов',
-    activityOverview: 'Обзор активности',
-    customerSignals: 'Сигналы клиентов',
+    leaderBonus: 'Бонус лидера до 15%',
+    activityOverview: 'Аналитика отзывов',
     totalReviews: 'Всего отзывов',
     averageReviewQuality: 'Среднее качество',
     couponsIssued: 'Выдано купонов',
@@ -111,13 +104,16 @@ const copy = {
     complaints: 'Частые жалобы',
     praised: 'Что хвалят',
     topUseful: 'Самые полезные отзывы',
-    fullName: 'Имя',
     monthly: 'Месячные баллы',
     badges: 'Бейджи',
     savedDevice: 'Ваш профиль сохранен на этом устройстве.',
     reset: 'Сбросить профиль',
     noName: 'Ваше имя',
-    writeMore: 'Добавьте больше деталей, чтобы сделать отзыв полезнее',
+    writeMore: 'Полезные отзывы помогают выбирать честнее',
+    detailMaster: 'Мастер деталей',
+    honestCritic: 'Честный критик',
+    helpfulVoice: 'Полезный голос',
+    topReviewer: 'Топ-автор',
   },
   en: {
     welcomeTitle: 'Welcome to Review Booster',
@@ -137,22 +133,14 @@ const copy = {
     profile: 'Profile',
     hi: 'Hi',
     purchaseQuestion: 'What did you purchase?',
-    marketplace: 'Marketplace',
-    store: 'Store',
-    cafe: 'Cafe / Restaurant',
-    service: 'Service',
-    selectMarketplace: 'Marketplace',
-    product: 'Product',
-    storeName: 'Store name',
-    cafeName: 'Cafe / restaurant name',
-    serviceName: 'Service name',
-    serviceType: 'Service type',
-    orderedItem: 'Ordered item',
-    other: 'Other',
+    whereBought: 'Where did you buy it?',
+    chooseProduct: 'Choose product',
+    writeOwnOption: 'Write your own option',
     writeProductName: 'Write product name',
     writeReview: 'Write your review',
-    reviewPlaceholder: 'Describe your experience: what worked, what could improve, and who it is best for.',
+    reviewPlaceholder: 'Describe real experience: usage time, quality, price, delivery, taste, service, or one honest downside.',
     publishReview: 'Publish Review',
+    yourRating: 'Your rating',
     publishing: 'Publishing review',
     checking: 'Checking useful details',
     calculating: 'Calculating quality score',
@@ -161,16 +149,14 @@ const copy = {
     scoreLine: 'Your review scored',
     bonus: 'Bonus',
     coupon: 'Coupon',
-    whyGood: 'Why: usage experience, specific details, and honest feedback.',
+    whyGood: 'Why: usage experience, specific details, and useful feedback.',
     lowResult: 'Your review was published, but the bonus is not unlocked yet.',
-    improve: 'Add more details to make your review more helpful.',
+    improve: 'Add more specific details: usage time, price, quality, delivery, taste, service, or one honest downside.',
     goFeed: 'Go to Feed',
     close: 'Close',
     recentReviews: 'Recent reviews',
     helpful: 'Helpful',
     counted: 'Counted',
-    qualityScore: 'Quality score',
-    bonusUnlocked: 'Bonus unlocked',
     bonusLocked: 'Bonus not unlocked yet',
     topReviewers: 'Top Reviewers',
     thisMonth: 'This month',
@@ -184,7 +170,8 @@ const copy = {
     trusted: 'Trusted Reviewer',
     expert: 'Review Expert',
     legend: 'Review Legend',
-    activityOverview: 'Activity overview',
+    leaderBonus: 'Leader bonus up to 15%',
+    activityOverview: 'Review insights',
     totalReviews: 'Total reviews',
     averageReviewQuality: 'Average review quality',
     couponsIssued: 'Coupons issued',
@@ -194,13 +181,16 @@ const copy = {
     complaints: 'Common complaints',
     praised: 'Most praised features',
     topUseful: 'Top useful reviews',
-    fullName: 'Full name',
     monthly: 'Monthly points',
     badges: 'Badges',
     savedDevice: 'Your profile is saved on this device.',
     reset: 'Reset profile',
     noName: 'Your name',
-    writeMore: 'Add more details to make your review more helpful',
+    writeMore: 'Useful reviews help people choose with confidence',
+    detailMaster: 'Detail Master',
+    honestCritic: 'Honest Critic',
+    helpfulVoice: 'Helpful Voice',
+    topReviewer: 'Top Reviewer',
   },
   kz: {
     welcomeTitle: 'Review Booster-ге қош келдіңіз',
@@ -216,44 +206,34 @@ const copy = {
     home: 'Басты',
     feed: 'Пікірлер',
     leaderboard: 'Рейтинг',
-    dashboard: 'Аналитика',
+    dashboard: 'Талдау',
     profile: 'Профиль',
     hi: 'Сәлем',
     purchaseQuestion: 'Сіз не сатып алдыңыз?',
-    marketplace: 'Маркетплейс',
-    store: 'Дүкен',
-    cafe: 'Кафе / ресторан',
-    service: 'Қызмет',
-    selectMarketplace: 'Маркетплейс',
-    product: 'Тауар',
-    storeName: 'Дүкен атауы',
-    cafeName: 'Кафе / ресторан атауы',
-    serviceName: 'Қызмет атауы',
-    serviceType: 'Қызмет түрі',
-    orderedItem: 'Тапсырыс',
-    other: 'Басқа',
-    writeProductName: 'Атауын жазыңыз',
+    whereBought: 'Қай жерден алдыңыз?',
+    chooseProduct: 'Өнімді таңдаңыз',
+    writeOwnOption: 'Өз нұсқаңызды жазыңыз',
+    writeProductName: 'Өнім атауын жазыңыз',
     writeReview: 'Пікіріңізді жазыңыз',
-    reviewPlaceholder: 'Тәжірибеңізді жазыңыз: не ұнады, не жақсартуға болады, кімге қолайлы.',
-    publishReview: 'Пікір жариялау',
+    reviewPlaceholder: 'Нақты тәжірибені жазыңыз: қолдану уақыты, сапа, баға, жеткізу, дәм, қызмет немесе бір шынайы минус.',
+    publishReview: 'Пікірді жариялау',
+    yourRating: 'Сіздің бағаңыз',
     publishing: 'Пікір жариялануда',
-    checking: 'Пайдалы детальдар тексерілуде',
+    checking: 'Пайдалы мәліметтер тексерілуде',
     calculating: 'Сапа бағасы есептелуде',
     rewardReady: 'Бонус шешімі дайын',
     published: 'Пікір жарияланды',
     scoreLine: 'Сіздің пікіріңіз алды',
     bonus: 'Бонус',
     coupon: 'Купон',
-    whyGood: 'Себебі: қолдану тәжірибесі, нақты детальдар және адал пікір бар.',
+    whyGood: 'Себебі: қолдану тәжірибесі, нақты мәліметтер және пайдалы пікір бар.',
     lowResult: 'Пікір жарияланды, бірақ бонус әлі ашылған жоқ.',
-    improve: 'Пікірді пайдалы ету үшін көбірек деталь қосыңыз.',
+    improve: 'Көбірек нақты мәлімет қосыңыз: қолдану уақыты, баға, сапа, жеткізу, дәм, қызмет немесе бір шынайы минус.',
     goFeed: 'Пікірлерге өту',
     close: 'Жабу',
     recentReviews: 'Соңғы пікірлер',
     helpful: 'Пайдалы',
     counted: 'Ескерілді',
-    qualityScore: 'Сапа бағасы',
-    bonusUnlocked: 'Бонус ашылды',
     bonusLocked: 'Бонус әлі ашылған жоқ',
     topReviewers: 'Үздік авторлар',
     thisMonth: 'Осы айда',
@@ -265,10 +245,10 @@ const copy = {
     level: 'Деңгей',
     beginner: 'Жаңа автор',
     trusted: 'Сенімді автор',
-    expert: 'Пікір эксперті',
+    expert: 'Пікір сарапшысы',
     legend: 'Пікір аңызы',
-    activityOverview: 'Белсенділік',
-    customerSignals: 'Клиент сигналдары',
+    leaderBonus: 'Көшбасшы бонусы 15%-ға дейін',
+    activityOverview: 'Пікір талдауы',
     totalReviews: 'Барлық пікір',
     averageReviewQuality: 'Орташа сапа',
     couponsIssued: 'Купондар',
@@ -278,28 +258,17 @@ const copy = {
     complaints: 'Жиі шағымдар',
     praised: 'Көп мақталған',
     topUseful: 'Ең пайдалы пікірлер',
-    fullName: 'Аты-жөні',
     monthly: 'Айлық ұпай',
     badges: 'Белгілер',
     savedDevice: 'Профиль осы құрылғыда сақталды.',
     reset: 'Профильді өшіру',
     noName: 'Сіздің атыңыз',
-    writeMore: 'Пікір пайдалы болуы үшін көбірек деталь қосыңыз',
+    writeMore: 'Пайдалы пікірлер адамдарға сенімді таңдауға көмектеседі',
+    detailMaster: 'Деталь шебері',
+    honestCritic: 'Адал сыншы',
+    helpfulVoice: 'Пайдалы дауыс',
+    topReviewer: 'Үздік автор',
   },
-}
-
-const categoryLabels = {
-  marketplace: { ru: 'Маркетплейс', en: 'Marketplace', kz: 'Маркетплейс' },
-  store: { ru: 'Магазин', en: 'Store', kz: 'Дүкен' },
-  cafe: { ru: 'Кафе / ресторан', en: 'Cafe / Restaurant', kz: 'Кафе / ресторан' },
-  service: { ru: 'Услуга', en: 'Service', kz: 'Қызмет' },
-}
-
-const levelKeyByEnglish = {
-  'Beginner Reviewer': 'beginner',
-  'Trusted Reviewer': 'trusted',
-  'Review Expert': 'expert',
-  'Review Legend': 'legend',
 }
 
 const navItems = [
@@ -311,23 +280,54 @@ const navItems = [
 ]
 
 const processingSteps = ['publishing', 'checking', 'calculating', 'rewardReady']
+const levelLabel = { beginner: 'beginner', trusted: 'trusted', expert: 'expert', legend: 'legend' }
+const badgeCopyKeys = {
+  'Detail Master': 'detailMaster',
+  'Honest Critic': 'honestCritic',
+  'Helpful Voice': 'helpfulVoice',
+  'Top Reviewer': 'topReviewer',
+}
 
 const initialForm = {
   category: 'marketplace',
-  marketplace: 'Kaspi',
-  product: 'Wireless headphones',
-  storeName: '',
-  storeProduct: 'Clothes',
-  cafeName: '',
-  cafeItem: 'Coffee',
-  serviceName: '',
-  serviceType: 'Delivery',
+  marketplace: 'kaspi',
+  marketplaceProduct: 'wireless_headphones',
+  storePlace: 'electronics_store',
+  storeProduct: 'electronics',
+  cafePlace: 'coffee_shop',
+  cafeItem: 'coffee',
+  servicePlace: 'delivery_service',
+  serviceType: 'delivery',
+  customPlace: '',
   customItem: '',
   rating: 4,
   text: '',
 }
 
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+const labelOf = (option, language) => option?.labels?.[language] ?? option?.labels?.en ?? ''
+const optionById = (options, id) => options.find((option) => option.id === id)
 const getAuthorName = (review) => `${review.authorFirstName ?? ''} ${review.authorLastName ?? ''}`.trim()
+
+const optionSets = {
+  marketplace: { places: MARKETPLACES, items: MARKETPLACE_PRODUCTS, placeKey: 'marketplace', itemKey: 'marketplaceProduct' },
+  store: { places: STORE_PLACES, items: STORE_PRODUCTS, placeKey: 'storePlace', itemKey: 'storeProduct' },
+  cafe: { places: CAFE_PLACES, items: CAFE_ITEMS, placeKey: 'cafePlace', itemKey: 'cafeItem' },
+  service: { places: SERVICE_PLACES, items: SERVICE_TYPES, placeKey: 'servicePlace', itemKey: 'serviceType' },
+}
+
+const getDisplayLabel = ({ options, id, fallback, language }) =>
+  labelOf(optionById(options, id), language) || fallback || ''
+
+const getReviewPlace = (review, language) => {
+  const set = optionSets[review.category]
+  return getDisplayLabel({ options: set?.places ?? [], id: review.placeId, fallback: review.placeName, language })
+}
+
+const getReviewItem = (review, language) => {
+  const set = optionSets[review.category]
+  return getDisplayLabel({ options: set?.items ?? [], id: review.itemId, fallback: review.itemName, language })
+}
 
 const getLevelKey = ({ averageQuality, reviewCount, helpfulLikes }) => {
   if (averageQuality >= 90 && reviewCount >= 4 && helpfulLikes >= 16) return 'legend'
@@ -354,15 +354,13 @@ const buildReviewerStats = (reviews, profile) => {
       const reviewCount = userReviews.length
       const helpfulLikes = userReviews.reduce((sum, review) => sum + review.helpfulLikes, 0)
       const couponsEarned = userReviews.filter((review) => review.couponCode).length
-      const averageQuality = Math.round(
-        userReviews.reduce((sum, review) => sum + review.score, 0) / Math.max(reviewCount, 1),
-      )
+      const averageQuality = reviewCount
+        ? Math.round(userReviews.reduce((sum, review) => sum + review.score, 0) / reviewCount)
+        : 0
       const reviewCountBonus = Math.min(reviewCount, 6) * 5
       const helpfulBonus = Math.min(helpfulLikes, 24) * 2
       const consistencyBonus = Math.min(userReviews.filter((review) => review.score >= 65).length * 4, 16)
-      const monthlyPoints = Math.round(
-        averageQuality * 0.6 + helpfulBonus + reviewCountBonus + consistencyBonus,
-      )
+      const monthlyPoints = Math.round(averageQuality * 0.6 + helpfulBonus + reviewCountBonus + consistencyBonus)
 
       return {
         name,
@@ -386,7 +384,7 @@ const buildReviewerStats = (reviews, profile) => {
       ...reviewer,
       rank: index + 1,
       maxBonusPercent: index < 3 ? 15 : 10,
-      badges: index < 3 ? [...reviewer.badges, 'Top Reviewer'] : reviewer.badges,
+      badges: index < 3 ? [...new Set([...reviewer.badges, 'Top Reviewer'])] : reviewer.badges,
     }))
 }
 
@@ -440,6 +438,18 @@ function Field({ label, children }) {
   )
 }
 
+function SelectField({ value, options, language, onChange }) {
+  return (
+    <select value={value} onChange={(event) => onChange(event.target.value)}>
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {labelOf(option, language)}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 function StarRating({ value, onChange }) {
   return (
     <div className="stars" aria-label="rating">
@@ -464,8 +474,6 @@ function ProgressBar({ value }) {
     </div>
   )
 }
-
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
 function App() {
   const [profile, setProfile] = useState(() => loadProfile())
@@ -516,18 +524,18 @@ function App() {
   const dashboard = getDashboardMetrics(reviews)
   const topReviews = [...reviews].sort((a, b) => b.score - a.score).slice(0, 3)
   const categoryCounts = CATEGORY_OPTIONS.map((category) => ({
-    label: categoryLabels[category][language],
-    count: reviews.filter((review) => review.category === category).length,
+    label: labelOf(category, language),
+    count: reviews.filter((review) => review.category === category.id).length,
   })).sort((a, b) => b.count - a.count)
   const complaints = countMatches(reviews, {
-    delivery: ['delivery', 'late', 'доставка', 'долгой', 'жеткізу'],
-    battery: ['battery', 'charge', 'батарея', 'заряд'],
-    price: ['expensive', 'price', 'дорого', 'цена', 'қымбат', 'баға'],
+    delivery: ['delivery', 'late', 'slow', 'доставка', 'долг', 'жеткізу'],
+    battery: ['battery', 'charge', 'microphone', 'батарея', 'заряд', 'микрофон'],
+    price: ['expensive', 'price', 'small', 'дорого', 'цена', 'қымбат', 'баға'],
   })
   const praises = countMatches(reviews, {
-    quality: ['quality', 'качеств', 'сапа'],
-    speed: ['fast', 'quick', 'быстро', 'тез'],
-    comfort: ['comfort', 'comfortable', 'удоб', 'ыңғайлы'],
+    quality: ['quality', 'clear', 'clean', 'качеств', 'сапа'],
+    speed: ['fast', 'quick', 'minutes', 'быстро', 'тез'],
+    comfort: ['comfort', 'comfortable', 'soft', 'удоб', 'ыңғайлы'],
   })
 
   const setProfileAndPersist = (nextProfile) => {
@@ -566,43 +574,27 @@ function App() {
   }
 
   const getSelectedPlaceAndItem = () => {
-    if (form.category === 'marketplace') {
-      return {
-        placeName: form.marketplace === 'Other' ? t.other : form.marketplace,
-        itemName: form.product === 'Other' ? form.customItem || t.other : form.product,
-      }
-    }
+    const set = optionSets[form.category]
+    const placeId = form[set.placeKey]
+    const itemId = form[set.itemKey]
+    const placeName = placeId === 'other' ? form.customPlace || t.writeOwnOption : labelOf(optionById(set.places, placeId), language)
+    const itemName = itemId === 'other' ? form.customItem || t.writeProductName : labelOf(optionById(set.items, itemId), language)
 
-    if (form.category === 'store') {
-      return {
-        placeName: form.storeName || t.store,
-        itemName: form.storeProduct === 'Other' ? form.customItem || t.other : form.storeProduct,
-      }
-    }
-
-    if (form.category === 'cafe') {
-      return {
-        placeName: form.cafeName || t.cafe,
-        itemName: form.cafeItem === 'Other' ? form.customItem || t.other : form.cafeItem,
-      }
-    }
-
-    return {
-      placeName: form.serviceName || t.service,
-      itemName: form.serviceType === 'Other' ? form.customItem || t.other : form.serviceType,
-    }
+    return { placeId, itemId, placeName, itemName }
   }
 
   const publishReview = () => {
     const trimmed = form.text.trim()
     if (!trimmed) return
 
-    const { placeName, itemName } = getSelectedPlaceAndItem()
+    const { placeId, itemId, placeName, itemName } = getSelectedPlaceAndItem()
     const newReview = createReviewRecord(
       {
         authorFirstName: profile.firstName,
         authorLastName: profile.lastName,
         category: form.category,
+        placeId,
+        itemId,
         placeName,
         itemName,
         rating: form.rating,
@@ -634,44 +626,42 @@ function App() {
   }
 
   if (!profile) {
+    const setupCopy = copy[setup.language]
+
     return (
       <main className="app-bg setup-screen">
         <section className="setup-card">
           <div className="brand-mark">
             <Sparkles size={24} />
           </div>
-          <h1>{copy[setup.language].welcomeTitle}</h1>
-          <p className="lead">{copy[setup.language].slogan}</p>
-          <p>{copy[setup.language].welcomeText}</p>
+          <h1>{setupCopy.welcomeTitle}</h1>
+          <p className="lead">{setupCopy.slogan}</p>
+          <p>{setupCopy.welcomeText}</p>
 
           <div className="setup-grid">
-            <Field label={copy[setup.language].firstName}>
+            <Field label={setupCopy.firstName}>
               <input value={setup.firstName} onChange={(event) => setSetup({ ...setup, firstName: event.target.value })} />
             </Field>
-            <Field label={copy[setup.language].lastName}>
+            <Field label={setupCopy.lastName}>
               <input value={setup.lastName} onChange={(event) => setSetup({ ...setup, lastName: event.target.value })} />
             </Field>
           </div>
 
-          <Field label={copy[setup.language].chooseLanguage}>
-            <SegmentedControl
-              value={setup.language}
-              options={languages}
-              onChange={(language) => setSetup({ ...setup, language })}
-            />
+          <Field label={setupCopy.chooseLanguage}>
+            <SegmentedControl value={setup.language} options={languages} onChange={(language) => setSetup({ ...setup, language })} />
           </Field>
 
-          <Field label={copy[setup.language].chooseTheme}>
+          <Field label={setupCopy.chooseTheme}>
             <SegmentedControl
               value={setup.theme}
               options={['dark', 'light']}
               onChange={(theme) => setSetup({ ...setup, theme })}
-              labelFor={(theme) => (theme === 'dark' ? copy[setup.language].dark : copy[setup.language].light)}
+              labelFor={(theme) => (theme === 'dark' ? setupCopy.dark : setupCopy.light)}
             />
           </Field>
 
           <button type="button" className="primary-button" onClick={handleContinue}>
-            {copy[setup.language].continue}
+            {setupCopy.continue}
             <ChevronRight size={18} />
           </button>
         </section>
@@ -753,6 +743,7 @@ function App() {
           review={result}
           processing={processing}
           processingStep={processingStep}
+          language={language}
           onClose={() => setResult(null)}
           onFeed={() => {
             setResult(null)
@@ -765,8 +756,9 @@ function App() {
 }
 
 function HomeScreen({ t, language, profile, form, setForm, publishReview, processing, processingStep }) {
-  const showCustomItem =
-    form.product === 'Other' || form.storeProduct === 'Other' || form.cafeItem === 'Other' || form.serviceType === 'Other'
+  const currentSet = optionSets[form.category]
+  const placeValue = form[currentSet.placeKey]
+  const itemValue = form[currentSet.itemKey]
 
   return (
     <div className="stack">
@@ -778,79 +770,59 @@ function HomeScreen({ t, language, profile, form, setForm, publishReview, proces
       <div className="category-grid">
         {CATEGORY_OPTIONS.map((category) => (
           <button
-            key={category}
+            key={category.id}
             type="button"
-            className={form.category === category ? 'category-card active' : 'category-card'}
-            onClick={() => setForm({ ...form, category, customItem: '' })}
+            className={form.category === category.id ? 'category-card active' : 'category-card'}
+            onClick={() => setForm({ ...form, category: category.id, customPlace: '', customItem: '' })}
           >
-            <span>{categoryLabels[category][language]}</span>
+            <span>{labelOf(category, language)}</span>
             <Check size={18} />
           </button>
         ))}
       </div>
 
       <section className="panel stack">
-        {form.category === 'marketplace' && (
-          <>
-            <Field label={t.selectMarketplace}>
-              <select value={form.marketplace} onChange={(event) => setForm({ ...form, marketplace: event.target.value })}>
-                {MARKETPLACES.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </Field>
-            <Field label={t.product}>
-              <select value={form.product} onChange={(event) => setForm({ ...form, product: event.target.value })}>
-                {MARKETPLACE_PRODUCTS.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </Field>
-          </>
-        )}
+        <Field label={t.whereBought}>
+          <SelectField
+            value={placeValue}
+            options={currentSet.places}
+            language={language}
+            onChange={(value) => setForm({ ...form, [currentSet.placeKey]: value })}
+          />
+        </Field>
 
-        {form.category === 'store' && (
-          <>
-            <Field label={t.storeName}>
-              <input value={form.storeName} onChange={(event) => setForm({ ...form, storeName: event.target.value })} />
-            </Field>
-            <Field label={t.product}>
-              <select value={form.storeProduct} onChange={(event) => setForm({ ...form, storeProduct: event.target.value })}>
-                {STORE_PRODUCTS.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </Field>
-          </>
-        )}
-
-        {form.category === 'cafe' && (
-          <>
-            <Field label={t.cafeName}>
-              <input value={form.cafeName} onChange={(event) => setForm({ ...form, cafeName: event.target.value })} />
-            </Field>
-            <Field label={t.orderedItem}>
-              <select value={form.cafeItem} onChange={(event) => setForm({ ...form, cafeItem: event.target.value })}>
-                {CAFE_ITEMS.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </Field>
-          </>
-        )}
-
-        {form.category === 'service' && (
-          <>
-            <Field label={t.serviceName}>
-              <input value={form.serviceName} onChange={(event) => setForm({ ...form, serviceName: event.target.value })} />
-            </Field>
-            <Field label={t.serviceType}>
-              <select value={form.serviceType} onChange={(event) => setForm({ ...form, serviceType: event.target.value })}>
-                {SERVICE_TYPES.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </Field>
-          </>
-        )}
-
-        {showCustomItem && (
-          <Field label={t.writeProductName}>
-            <input value={form.customItem} onChange={(event) => setForm({ ...form, customItem: event.target.value })} />
+        {placeValue === 'other' && (
+          <Field label={t.writeOwnOption}>
+            <input
+              value={form.customPlace}
+              placeholder={t.writeOwnOption}
+              onChange={(event) => setForm({ ...form, customPlace: event.target.value })}
+            />
           </Field>
         )}
 
-        <StarRating value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
+        <Field label={t.chooseProduct}>
+          <SelectField
+            value={itemValue}
+            options={currentSet.items}
+            language={language}
+            onChange={(value) => setForm({ ...form, [currentSet.itemKey]: value })}
+          />
+        </Field>
+
+        {itemValue === 'other' && (
+          <Field label={t.writeProductName}>
+            <input
+              value={form.customItem}
+              placeholder={t.writeProductName}
+              onChange={(event) => setForm({ ...form, customItem: event.target.value })}
+            />
+          </Field>
+        )}
+
+        <Field label={t.yourRating}>
+          <StarRating value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
+        </Field>
 
         <Field label={t.writeReview}>
           <textarea
@@ -870,9 +842,10 @@ function HomeScreen({ t, language, profile, form, setForm, publishReview, proces
   )
 }
 
-function ResultModal({ t, review, processing, processingStep, onClose, onFeed }) {
+function ResultModal({ t, review, processing, processingStep, language, onClose, onFeed }) {
   const displayedScore = review?.score ?? 0
   const hasBonus = (review?.bonusPercent ?? 0) > 0
+  const suggestions = review?.suggestions?.[language] ?? []
 
   return (
     <div className="modal-backdrop">
@@ -907,6 +880,13 @@ function ResultModal({ t, review, processing, processingStep, onClose, onFeed })
               </div>
             </div>
             <p className="muted">{hasBonus ? t.whyGood : t.improve}</p>
+            {suggestions.length > 0 && (
+              <div className="modal-suggestions">
+                {suggestions.slice(0, 3).map((suggestion) => (
+                  <span key={suggestion}>{suggestion}</span>
+                ))}
+              </div>
+            )}
             <button type="button" className="primary-button" onClick={onFeed}>
               {t.goFeed}
               <ChevronRight size={18} />
@@ -942,12 +922,12 @@ function ReviewCard({ t, language, review, liked, onHelpful }) {
       <div className="review-head">
         <div>
           <strong>{getAuthorName(review)}</strong>
-          <span>{categoryLabels[review.category]?.[language]} · {review.placeName}</span>
+          <span>{labelOf(optionById(CATEGORY_OPTIONS, review.category), language)} · {getReviewPlace(review, language)}</span>
         </div>
         <div className="score-badge">{review.score}</div>
       </div>
       <div className="review-meta">
-        <span>{review.itemName}</span>
+        <span>{getReviewItem(review, language)}</span>
         <span>{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
       </div>
       <p>{review.text}</p>
@@ -1004,7 +984,7 @@ function LeaderboardScreen({ t, reviewers }) {
                 </div>
                 <div className="rank-info">
                   <strong>{reviewer.name}</strong>
-                  <span>{t[levelKeyByEnglish[reviewer.levelKey] ?? reviewer.levelKey] ?? t[reviewer.levelKey]}</span>
+                  <span>{t[levelLabel[reviewer.levelKey]]}</span>
                 </div>
                 <div className="rank-points">
                   <strong>{reviewer.monthlyPoints}</strong>
@@ -1023,7 +1003,7 @@ function LeaderboardScreen({ t, reviewers }) {
                 {reviewer.rank <= 3 && (
                   <div className={`rank-badge rank-${reviewer.rank}`}>
                     {reviewer.rank === 1 ? <Trophy size={15} /> : <Crown size={15} />}
-                    Top {reviewer.rank}
+                    {t.leaderBonus}
                   </div>
                 )}
                 <div className="mini-stats">
@@ -1059,8 +1039,8 @@ function DashboardScreen({ t, dashboard, categoryCounts, complaints, praises, to
         <h2>{t.topUseful}</h2>
         {topReviews.map((review) => (
           <div key={review.id} className="compact-review">
-            <strong>{review.itemName}</strong>
-            <span>{categoryLabels[review.category]?.[language]} · {review.score}/100</span>
+            <strong>{getReviewItem(review, language)}</strong>
+            <span>{labelOf(optionById(CATEGORY_OPTIONS, review.category), language)} · {review.score}/100</span>
           </div>
         ))}
       </section>
@@ -1088,7 +1068,7 @@ function ProfileScreen({ t, profile, currentReviewer, updateProfile, resetProfil
         <h2>{t.badges}</h2>
         <div className="badge-row">
           {(currentReviewer.badges.length ? currentReviewer.badges : ['Detail Master']).map((badge) => (
-            <span key={badge}>{badge}</span>
+            <span key={badge}>{t[badgeCopyKeys[badge]] ?? badge}</span>
           ))}
         </div>
       </section>
