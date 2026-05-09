@@ -1,67 +1,59 @@
-import { CURRENT_REVIEWER, SAMPLE_REVIEW_SEEDS } from '../data/sampleData'
+import { SAMPLE_REVIEW_SEEDS } from '../data/sampleData'
 import { createReviewRecord } from './reviewEngine'
 
-const REVIEWS_KEY = 'review-booster.reviews'
-const LIKED_REVIEWS_KEY = 'review-booster.likedReviews'
+const PROFILE_KEY = 'review-booster.profile'
+const REVIEWS_KEY = 'review-booster.reviews.v2'
+const LIKED_REVIEWS_KEY = 'review-booster.likedReviews.v2'
 
 const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
 
-const buildSeedReviews = () => SAMPLE_REVIEW_SEEDS.map((seed) => createReviewRecord(seed))
+const readJson = (key, fallback) => {
+  if (!canUseStorage()) return fallback
+
+  try {
+    const raw = window.localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : fallback
+  } catch {
+    return fallback
+  }
+}
+
+const writeJson = (key, value) => {
+  if (!canUseStorage()) return
+  window.localStorage.setItem(key, JSON.stringify(value))
+}
+
+export const buildSeedReviews = () =>
+  SAMPLE_REVIEW_SEEDS.map((seed) =>
+    createReviewRecord({
+      ...seed,
+      isSeed: true,
+    }),
+  )
+
+export const loadProfile = () => readJson(PROFILE_KEY, null)
+
+export const saveProfile = (profile) => writeJson(PROFILE_KEY, profile)
+
+export const clearProfile = () => {
+  if (!canUseStorage()) return
+  window.localStorage.removeItem(PROFILE_KEY)
+}
 
 export const loadReviews = () => {
-  if (!canUseStorage()) {
-    return buildSeedReviews()
+  const reviews = readJson(REVIEWS_KEY, null)
+
+  if (Array.isArray(reviews) && reviews.length > 0) {
+    return reviews
   }
 
-  const raw = window.localStorage.getItem(REVIEWS_KEY)
-
-  if (!raw) {
-    const seeded = buildSeedReviews()
-    window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(seeded))
-    return seeded
-  }
-
-  try {
-    const parsed = JSON.parse(raw)
-
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      const seeded = buildSeedReviews()
-      window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(seeded))
-      return seeded
-    }
-
-    return parsed
-  } catch {
-    const seeded = buildSeedReviews()
-    window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(seeded))
-    return seeded
-  }
+  const seeded = buildSeedReviews()
+  writeJson(REVIEWS_KEY, seeded)
+  return seeded
 }
 
-export const saveReviews = (reviews) => {
-  if (!canUseStorage()) return
-  window.localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews))
-}
+export const saveReviews = (reviews) => writeJson(REVIEWS_KEY, reviews)
 
-export const loadLikedReviewIds = () => {
-  if (!canUseStorage()) return []
+export const loadLikedReviewIds = () => readJson(LIKED_REVIEWS_KEY, [])
 
-  try {
-    return JSON.parse(window.localStorage.getItem(LIKED_REVIEWS_KEY) ?? '[]')
-  } catch {
-    return []
-  }
-}
-
-export const saveLikedReviewIds = (ids) => {
-  if (!canUseStorage()) return
-  window.localStorage.setItem(LIKED_REVIEWS_KEY, JSON.stringify(ids))
-}
-
-export const resetMvpState = () => {
-  if (!canUseStorage()) return
-  window.localStorage.removeItem(REVIEWS_KEY)
-  window.localStorage.removeItem(LIKED_REVIEWS_KEY)
-}
-
-export { CURRENT_REVIEWER }
+export const saveLikedReviewIds = (ids) => writeJson(LIKED_REVIEWS_KEY, ids)

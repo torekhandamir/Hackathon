@@ -1,209 +1,215 @@
-const STOP_WORDS = new Set([
-  'the',
-  'and',
-  'for',
-  'with',
-  'that',
-  'this',
-  'from',
-  'have',
-  'has',
-  'had',
-  'were',
-  'was',
-  'are',
-  'is',
-  'but',
-  'you',
-  'your',
-  'they',
-  'them',
-  'their',
-  'very',
-  'just',
-  'really',
-  'into',
-  'than',
-  'after',
-  'before',
-  'during',
-  'because',
-])
-
-const DETAIL_KEYWORDS = [
-  'battery',
-  'hours',
-  'cushion',
-  'foam',
-  'zipper',
-  'strap',
-  'stitching',
-  'fabric',
-  'hood',
-  'size',
-  'toe box',
-  'heel',
-  'usb',
-  'usb-c',
-  'cable',
-  'frother',
-  'water tank',
-  'design',
-  'microphone',
-  'case',
-  'price',
-  'value',
-  'pocket',
-  'laptop sleeve',
-  'fit',
-  'comfort',
-  'call',
-  'charge',
-  'commute',
-]
-
-const USAGE_KEYWORDS = [
-  'used',
-  'using',
-  'after',
-  'during',
-  'daily',
-  'week',
-  'weeks',
-  'month',
-  'months',
-  'commute',
-  'office',
-  'travel',
-  'trip',
-  'gym',
-  'run',
-  'running',
-  'sessions',
-  'washing',
-  'washes',
-  'kitchen',
-  'train ride',
-]
-
-const PROS_KEYWORDS = [
-  'comfortable',
-  'great',
-  'quick',
-  'strong',
-  'durable',
-  'soft',
-  'clear',
-  'solid',
-  'premium',
-  'simple',
-  'worth',
-  'value',
-  'light',
-  'good option',
-]
-
-const CONS_KEYWORDS = [
-  'but',
-  'however',
-  'wish',
-  'could be',
-  'problem',
-  'issue',
-  'narrow',
-  'scratches',
-  'warm',
-  'hard to read',
-  'delivery',
-  'longer',
-  'deeper',
-  'rubbed',
-]
-
-const ADVICE_KEYWORDS = [
-  'recommend',
-  'if you',
-  'buyers',
-  'worth',
-  'keep in mind',
-  'good option',
-  'strong value',
-  'go',
-  'consider',
-]
-
-const CONSTRUCTIVE_KEYWORDS = [
-  'because',
-  'could',
-  'would',
-  'should',
-  'improve',
-  'wish',
-  'recommend',
-  'keep in mind',
-  'if you',
-  'better',
-]
-
-const GENERIC_PHRASES = [
-  'good product',
-  'nice product',
-  'excellent quality',
-  'love it',
-  'amazing',
-  'perfect',
-  'bad product',
-  'terrible',
-  'just okay',
-]
-
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
-const getWords = (text) => text.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? []
+const usageKeywords = [
+  'used',
+  'using',
+  'for ',
+  'after',
+  'bought',
+  'tried',
+  'ordered',
+  'пользуюсь',
+  'использовал',
+  'использую',
+  'купил',
+  'купила',
+  'брала',
+  'брал',
+  'заказал',
+  'заказала',
+  'неделю',
+  'месяц',
+  'год',
+  'лет',
+  'қолдандым',
+  'пайдаландым',
+  'сатып алдым',
+  'тапсырыс бердім',
+  'апта',
+  'ай',
+  'жыл',
+]
 
-const getKeywordMatches = (lowerText, keywords) =>
-  keywords.filter((keyword) => lowerText.includes(keyword))
+const detailKeywords = [
+  'size',
+  'delivery',
+  'taste',
+  'comfort',
+  'battery',
+  'quality',
+  'price',
+  'service',
+  'atmosphere',
+  'packaging',
+  'speed',
+  'smell',
+  'design',
+  'fit',
+  'material',
+  'portion',
+  'staff',
+  'location',
+  'размер',
+  'доставка',
+  'вкус',
+  'удобно',
+  'батарея',
+  'качество',
+  'цена',
+  'цену',
+  'сервис',
+  'атмосфера',
+  'упаковка',
+  'скорость',
+  'запах',
+  'дизайн',
+  'посадка',
+  'материал',
+  'порция',
+  'персонал',
+  'орналасуы',
+  'өлшем',
+  'жеткізу',
+  'дәм',
+  'ыңғайлы',
+  'сапа',
+  'баға',
+  'қызмет',
+  'қаптама',
+  'тез',
+  'иіс',
+  'дизайн',
+]
 
-const getCapsRatio = (text) => {
-  const letters = text.match(/[A-Za-z]/g) ?? []
-  const caps = text.match(/[A-Z]/g) ?? []
+const prosKeywords = [
+  'good',
+  'great',
+  'comfortable',
+  'fast',
+  'tasty',
+  'useful',
+  'durable',
+  'cheap',
+  'quality',
+  'nice',
+  'excellent',
+  'хорошо',
+  'хороший',
+  'хорошее',
+  'удобный',
+  'удобно',
+  'вкусно',
+  'быстро',
+  'качественный',
+  'приятный',
+  'полезный',
+  'недорогой',
+  'отличный',
+  'нормально',
+  'жақсы',
+  'ыңғайлы',
+  'дәмді',
+  'сапалы',
+  'тез',
+  'пайдалы',
+  'арзан',
+  'керемет',
+]
 
-  return letters.length ? caps.length / letters.length : 0
-}
+const consKeywords = [
+  'but',
+  'however',
+  'although',
+  'downside',
+  'problem',
+  'issue',
+  'slow',
+  'expensive',
+  'bad',
+  'not ideal',
+  'но',
+  'однако',
+  'минус',
+  'проблема',
+  'медленно',
+  'долг',
+  'дорого',
+  'плохо',
+  'неудобно',
+  'бірақ',
+  'алайда',
+  'минус',
+  'мәселе',
+  'баяу',
+  'қымбат',
+  'жаман',
+]
 
-const getHighestMeaningfulFrequency = (words) => {
+const adviceKeywords = [
+  'recommend',
+  'would buy again',
+  'suitable for',
+  'good for',
+  'best for',
+  'not ideal for',
+  'рекомендую',
+  'советую',
+  'подойдет',
+  'подходит',
+  'не подойдет',
+  'лучше для',
+  'стоит брать',
+  'за свою цену',
+  'ұсынамын',
+  'кеңес беремін',
+  'жарайды',
+  'қолайлы',
+]
+
+const toxicKeywords = ['idiot', 'stupid', 'hate you', 'тупой', 'идиот', 'ақымақ']
+const meaninglessShort = ['ok', 'norm', 'bad', 'cool', 'ок', 'норм', 'ужас', 'супер']
+
+const getWords = (text) => text.match(/[\p{L}\p{N}'-]+/gu) ?? []
+const includesAny = (text, keywords) => keywords.filter((keyword) => text.includes(keyword))
+
+const getRepetitionPenalty = (words) => {
   const counts = new Map()
 
   words.forEach((word) => {
     const token = word.toLowerCase()
-
-    if (token.length < 3 || STOP_WORDS.has(token)) {
-      return
-    }
-
+    if (token.length < 3) return
     counts.set(token, (counts.get(token) ?? 0) + 1)
   })
 
-  return [...counts.values()].reduce((max, count) => Math.max(max, count), 0)
+  const maxRepeat = [...counts.values()].reduce((max, count) => Math.max(max, count), 0)
+  return maxRepeat > 3 ? Math.min((maxRepeat - 3) * 5, 18) : 0
 }
 
 export const getQualityLevel = (score) => {
-  if (score < 50) return 'Weak'
-  if (score < 70) return 'Average'
-  if (score < 85) return 'Good'
-  return 'Excellent'
+  if (score < 45) return 'Beginner Reviewer'
+  if (score < 65) return 'Trusted Reviewer'
+  if (score < 85) return 'Review Expert'
+  return 'Review Legend'
 }
 
-export const getBonusDecision = (score) => {
-  if (score < 50) return { percent: 0, label: 'No reward', approved: false }
-  if (score < 70) return { percent: 5, label: '5% coupon', approved: true }
-  if (score < 85) return { percent: 10, label: '10% coupon', approved: true }
-  return { percent: 15, label: '15% coupon', approved: true }
+export const getBonusDecision = (score, maxBonusPercent = 10) => {
+  let percent = 0
+
+  if (score >= 85) percent = maxBonusPercent >= 15 ? 15 : 10
+  else if (score >= 65) percent = 10
+  else if (score >= 45) percent = 5
+
+  percent = Math.min(percent, maxBonusPercent)
+
+  return {
+    percent,
+    label: percent ? `${percent}%` : '0%',
+    approved: percent > 0,
+  }
 }
 
 export const generateCouponCode = (percent) => {
   if (!percent) return null
-
   const token = Math.random().toString(36).slice(2, 6).toUpperCase()
   return `RB-${percent}-${token}`
 }
@@ -212,90 +218,53 @@ export const scoreReview = ({ text = '', rating = 0 }) => {
   const normalizedText = text.trim().replace(/\s+/g, ' ')
   const lowerText = normalizedText.toLowerCase()
   const words = getWords(normalizedText)
-  const sentences = normalizedText
-    .split(/[.!?]+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean)
-  const longWords = words.map((word) => word.toLowerCase()).filter((word) => word.length > 2)
-  const uniqueRatio = new Set(longWords).size / Math.max(longWords.length, 1)
-  const avgWordsPerSentence = words.length / Math.max(sentences.length, 1)
+  const wordCount = words.length
+  const uniqueRatio = new Set(words.map((word) => word.toLowerCase())).size / Math.max(wordCount, 1)
+  const hasNumber = /\d/.test(normalizedText)
+  const hasPeriod = /\b(\d+\s*)?(years?|months?|weeks?|days?|лет|год|месяц|недел|ай|жыл|апта)\b/i.test(lowerText)
 
-  const detailMatches = getKeywordMatches(lowerText, DETAIL_KEYWORDS)
-  const usageMatches = getKeywordMatches(lowerText, USAGE_KEYWORDS)
-  const prosMatches = getKeywordMatches(lowerText, PROS_KEYWORDS)
-  const consMatches = getKeywordMatches(lowerText, CONS_KEYWORDS)
-  const adviceMatches = getKeywordMatches(lowerText, ADVICE_KEYWORDS)
-  const constructiveMatches = getKeywordMatches(lowerText, CONSTRUCTIVE_KEYWORDS)
-  const genericMatches = getKeywordMatches(lowerText, GENERIC_PHRASES)
+  const usageMatches = includesAny(lowerText, usageKeywords)
+  const detailMatches = includesAny(lowerText, detailKeywords)
+  const prosMatches = includesAny(lowerText, prosKeywords)
+  const consMatches = includesAny(lowerText, consKeywords)
+  const adviceMatches = includesAny(lowerText, adviceKeywords)
+  const toxicMatches = includesAny(lowerText, toxicKeywords)
 
-  const numericMentions = normalizedText.match(/\b\d+([.,]\d+)?\b/g)?.length ?? 0
-  const measurementMentions =
-    normalizedText.match(/\b(hours?|days?|weeks?|km|mah|size|washes?|sessions?)\b/gi)?.length ?? 0
-  const highestMeaningfulFrequency = getHighestMeaningfulFrequency(words)
+  // The scoring is intentionally local and explainable: each useful review signal
+  // contributes a capped score, then spam and low-information patterns subtract points.
+  let lengthScore = 0
+  if (wordCount >= 35) lengthScore = 30
+  else if (wordCount >= 16) lengthScore = 24
+  else if (wordCount >= 5) lengthScore = 16
+  else if (wordCount >= 2) lengthScore = 8
 
-  const lengthScore = clamp(
-    Math.round(words.length * 0.42 + Math.min(sentences.length, 3) * 2),
-    0,
-    18,
-  )
-  const detailScore = clamp(
-    detailMatches.length * 4 + numericMentions * 2 + measurementMentions * 2,
-    0,
-    18,
-  )
-  const usageScore = clamp(
-    usageMatches.length * 3 + (sentences.length > 1 ? 2 : 0) + (numericMentions ? 2 : 0),
-    0,
-    14,
-  )
-  const prosScore = clamp(prosMatches.length * 3 + (prosMatches.length ? 1 : 0), 0, 10)
-  const consScore = clamp(consMatches.length * 3 + (consMatches.length ? 1 : 0), 0, 10)
-  const adviceScore = clamp(
-    adviceMatches.length * 3 + (lowerText.includes('if you') ? 2 : 0),
-    0,
-    12,
-  )
-  const constructiveScore = clamp(
-    constructiveMatches.length * 2 + (prosMatches.length && consMatches.length ? 2 : 0),
-    0,
-    10,
-  )
-  const readabilityScore = clamp(
-    (sentences.length > 1 ? 4 : 0) +
-      (avgWordsPerSentence >= 7 && avgWordsPerSentence <= 28 ? 2 : 0) +
-      (words.length >= 24 ? 2 : 0),
-    0,
-    8,
-  )
+  const usageScore = usageMatches.length || hasPeriod ? 16 : 0
+  const detailScore = clamp(detailMatches.length * 4 + (hasNumber ? 4 : 0) + (hasPeriod ? 4 : 0), 0, 20)
+  const prosScore = prosMatches.length ? 10 : 0
+  const consScore = consMatches.length ? 10 : 0
+  const adviceScore = adviceMatches.length ? 10 : 0
+  const constructiveScore = toxicMatches.length === 0 && wordCount >= 3 ? 10 : 0
 
-  const genericPenalty = clamp(
-    genericMatches.length * 4 +
-      (words.length < 16 && detailMatches.length === 0 ? 8 : 0) +
-      (words.length < 22 && sentences.length < 2 ? 4 : 0),
-    0,
-    18,
-  )
-
-  const repetitionPenalty = clamp(
-    (highestMeaningfulFrequency > 3 ? (highestMeaningfulFrequency - 3) * 3 : 0) +
-      (uniqueRatio < 0.48 && words.length > 14 ? 8 : 0) +
-      (/([!?])\1{1,}/.test(normalizedText) ? 4 : 0) +
-      (getCapsRatio(normalizedText) > 0.34 && words.length > 8 ? 4 : 0),
-    0,
-    18,
-  )
+  const genericOnlyPenalty =
+    wordCount <= 3 && meaninglessShort.some((phrase) => lowerText === phrase || lowerText === `very ${phrase}`)
+      ? 8
+      : 0
+  const randomLettersPenalty = /([a-zа-яәғқңөұүһі])\1{4,}/i.test(lowerText) ? 18 : 0
+  const emojiPenalty = (normalizedText.match(/\p{Extended_Pictographic}/gu)?.length ?? 0) > 3 ? 10 : 0
+  const repetitionPenalty = getRepetitionPenalty(words) + (uniqueRatio < 0.45 && wordCount > 8 ? 10 : 0)
 
   const score = clamp(
     Math.round(
       lengthScore +
-        detailScore +
         usageScore +
+        detailScore +
         prosScore +
         consScore +
         adviceScore +
-        constructiveScore +
-        readabilityScore -
-        genericPenalty -
+        constructiveScore -
+        genericOnlyPenalty -
+        randomLettersPenalty -
+        emojiPenalty -
         repetitionPenalty,
     ),
     0,
@@ -304,63 +273,64 @@ export const scoreReview = ({ text = '', rating = 0 }) => {
 
   const signals = {
     hasSpecificDetails: detailScore >= 10,
-    hasUsageExperience: usageScore >= 8,
-    hasProsAndCons: prosScore >= 4 && consScore >= 4,
-    helpfulForBuyers: adviceScore >= 4 || (detailScore >= 10 && usageScore >= 8),
-    lowSpamRisk: repetitionPenalty <= 4 && genericPenalty <= 8,
-  }
-
-  const suggestions = []
-
-  if (words.length < 22) {
-    suggestions.push('Add more context about what you used, how long you used it, and what happened.')
-  }
-  if (!signals.hasSpecificDetails) {
-    suggestions.push('Mention concrete details such as fit, battery, material, size, or measurable results.')
-  }
-  if (!signals.hasUsageExperience) {
-    suggestions.push('Describe a real usage scenario so buyers understand where the product performs well or poorly.')
-  }
-  if (!signals.hasProsAndCons) {
-    suggestions.push('Balance the review with at least one strength and one drawback to keep it useful and fair.')
-  }
-  if (!signals.helpfulForBuyers) {
-    suggestions.push('Add advice for future buyers, like who the product suits or what to watch out for.')
-  }
-  if (!signals.lowSpamRisk) {
-    suggestions.push('Reduce repeated phrases, excessive punctuation, and generic wording.')
+    hasUsageExperience: usageScore > 0,
+    hasPros: prosScore > 0,
+    hasCons: consScore > 0,
+    hasProsAndCons: prosScore > 0 && consScore > 0,
+    helpfulForBuyers: detailScore >= 10 || adviceScore > 0 || usageScore > 0,
+    lowSpamRisk: genericOnlyPenalty + randomLettersPenalty + emojiPenalty + repetitionPenalty <= 8,
   }
 
   return {
     score,
     qualityLevel: getQualityLevel(score),
-    suggestions: suggestions.slice(0, 4),
     signals,
+    suggestions: {
+      ru: [
+        !signals.hasSpecificDetails && 'Добавьте конкретные детали: цену, доставку, размер, вкус, батарею или сервис.',
+        !signals.hasUsageExperience && 'Опишите реальный опыт использования или покупки.',
+        !signals.hasProsAndCons && 'Добавьте честный плюс и минус, если они есть.',
+        !adviceScore && 'Напишите, кому это подойдет или не подойдет.',
+      ].filter(Boolean),
+      en: [
+        !signals.hasSpecificDetails && 'Add concrete details such as price, delivery, size, taste, battery, or service.',
+        !signals.hasUsageExperience && 'Describe your real usage or purchase experience.',
+        !signals.hasProsAndCons && 'Add an honest strength and drawback if possible.',
+        !adviceScore && 'Explain who this is suitable for.',
+      ].filter(Boolean),
+      kz: [
+        !signals.hasSpecificDetails && 'Баға, жеткізу, өлшем, дәм, батарея немесе қызмет туралы нақты деталь қосыңыз.',
+        !signals.hasUsageExperience && 'Өзіңіздің қолдану немесе сатып алу тәжірибеңізді жазыңыз.',
+        !signals.hasProsAndCons && 'Мүмкін болса, бір артықшылық пен бір кемшілік қосыңыз.',
+        !adviceScore && 'Бұл кімге қолайлы екенін жазыңыз.',
+      ].filter(Boolean),
+    },
     metrics: {
-      words: words.length,
-      sentences: sentences.length,
-      uniqueRatio,
-      detailScore,
+      words: wordCount,
+      rating,
+      lengthScore,
       usageScore,
+      detailScore,
       prosScore,
       consScore,
       adviceScore,
       constructiveScore,
-      genericPenalty,
-      repetitionPenalty,
-      rating,
+      spamPenalty: genericOnlyPenalty + randomLettersPenalty + emojiPenalty + repetitionPenalty,
     },
   }
 }
 
-export const createReviewRecord = (input) => {
+export const createReviewRecord = (input, options = {}) => {
   const analysis = scoreReview(input)
-  const bonus = getBonusDecision(analysis.score)
+  const bonus = getBonusDecision(analysis.score, options.maxBonusPercent ?? 10)
 
   return {
     id: input.id ?? `review-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    author: input.author,
-    product: input.product,
+    authorFirstName: input.authorFirstName,
+    authorLastName: input.authorLastName,
+    category: input.category,
+    placeName: input.placeName,
+    itemName: input.itemName,
     rating: input.rating,
     text: input.text.trim().replace(/\s+/g, ' '),
     helpfulLikes: input.helpfulLikes ?? 0,

@@ -1,124 +1,141 @@
 # Review Booster
 
-Review Booster is a hackathon MVP for rewarding useful customer reviews instead of rewarding only positive sentiment. The product analyzes each review locally in the browser, scores how helpful it is, and issues a coupon only when the feedback is detailed, constructive, and buyer-friendly.
+Review Booster is a product MVP that helps businesses collect more useful customer reviews by rewarding review quality, not positive sentiment. Customers publish reviews, receive a fast quality score, earn coupons when their feedback is helpful, and build reputation through useful reviews and helpful likes.
 
 ## Problem
 
-Most review incentive systems accidentally push people toward short, overly positive comments that do not help future buyers or the business. That creates fake-looking review sections and weak customer insight.
+Many reward systems push customers toward short positive reviews. Those reviews may increase star averages, but they do not help future buyers understand tradeoffs, and they do not give businesses clear signals about what to improve.
 
 ## Solution
 
-Review Booster flips the logic:
+Review Booster rewards usefulness:
 
-- Bonuses depend on usefulness, not positivity.
-- Negative reviews can still earn rewards if they are specific and constructive.
-- Scoring happens locally in under 5 seconds, so the demo stays fast and reliable.
-- The same review data powers rewards, reviewer reputation, leaderboard ranking, and business insight.
+- Detailed positive reviews can earn rewards.
+- Detailed negative reviews can also earn rewards.
+- Generic or repetitive reviews receive low scores.
+- Helpful likes improve reviewer reputation, but quality remains the main leaderboard factor.
+- Business insights turn review text into signals about complaints, praised features, categories, and trust growth.
 
-## Key Features
+## Main Flow
 
-- Premium dark navy mobile-first UI built with React, Vite, and Tailwind CSS
-- Local rule-based review scoring from `0` to `100`
-- Instant coupon generation for helpful reviews
-- Review feed with helpful likes and anti-abuse cap
-- Reviewer profile with levels and badges
-- Leaderboard ranked by quality-first reviewer score
-- Business dashboard with trust metrics and insight extraction
-- LocalStorage persistence so reviews remain after refresh
-- Preloaded sample data so the MVP feels alive during judging
+1. The user creates a lightweight profile saved on the device.
+2. The user chooses a category: marketplace, store, cafe / restaurant, or service.
+3. The user selects or writes the purchased product, item, or service.
+4. The user adds a star rating and publishes a review.
+5. The local scoring engine analyzes usefulness in under 5 seconds.
+6. A result popup shows the quality score, bonus decision, and coupon code if unlocked.
+7. The review appears in the feed where other users can mark it as helpful.
+8. Profile, leaderboard, and business insights update automatically.
 
 ## Tech Stack
 
 - React 19
 - Vite
 - Tailwind CSS v4 via `@tailwindcss/vite`
-- LocalStorage for MVP persistence
-- Plain JavaScript rule-based NLP logic
+- lucide-react icons
+- LocalStorage for profile, reviews, likes, language, theme, and app state
+- Fast local rule-based NLP scoring
 
-## Why No OpenAI API In The MVP
+## Why A Local Algorithm Instead Of OpenAI API
 
-The hackathon case requires review analysis and coupon issuing in less than 5 seconds. Calling an external LLM API would add network latency, dependency risk, and demo fragility. For the MVP, a local rule-based engine is the safer choice because it is:
+The core review check and coupon decision must finish in less than 5 seconds. A local rule-based engine avoids network latency, API availability risk, and unpredictable response times. It also makes the logic easy to explain: the score comes from transparent signals such as usage experience, specific details, pros, cons, advice, constructive tone, and spam penalties.
 
-- fast
-- deterministic
-- offline-friendly
-- easy to explain to judges
-- reliable on a normal smartphone
+OpenAI or another LLM could be added later for deeper summarization, but the main reward decision is intentionally local and instant.
 
-This keeps the main scoring loop entirely in-browser and near-instant.
+## How The `< 5 Second` Requirement Is Met
 
-## How The `< 5 second` Requirement Is Met
-
-- The review text is processed locally in the frontend.
-- No server call is required for the main scoring step.
-- The app uses a short `420ms` loading animation only for perceived polish.
-- Coupon generation happens immediately after scoring.
-- Reviews, likes, and dashboard updates are stored locally.
-
-In practice, the logic runs almost instantly and comfortably inside the time limit.
+- Review scoring runs in the browser.
+- No server request is required for the reward decision.
+- The publish animation lasts only about 650ms.
+- Coupon generation is synchronous.
+- Feed, profile, leaderboard, and dashboard updates are stored locally.
 
 ## Scoring Algorithm
 
-The scoring engine is rule-based and rewards usefulness, not positivity.
+The scoring engine returns `0-100` and supports English, Russian, and Kazakh keywords.
 
-Positive factors:
+Positive scoring signals:
 
-- review length
-- specific details and measurable facts
-- real usage experience
-- pros mentioned
-- cons mentioned
-- advice for other buyers
-- constructive tone
-- readable structure
+- Length and detail level
+- Usage experience such as "used", "пользуюсь", or "қолдандым"
+- Time periods such as years, months, weeks, "год", "месяц", "жыл"
+- Specific details such as delivery, taste, comfort, battery, quality, price, service, atmosphere, packaging, size, material, portion, staff, and location
+- Pros such as good, tasty, useful, качественный, жақсы, сапалы
+- Cons or balanced feedback such as but, problem, но, минус, бірақ
+- Advice or recommendation such as recommend, советую, ұсынамын
+- Constructive non-toxic tone
 
-Penalty factors:
+Penalty signals:
 
-- generic praise or generic complaints
-- repeated words or phrases
-- spammy punctuation / excessive caps
-- lack of details
+- Repeated words
+- Random repeated letters
+- Too many emoji
+- Extremely short low-information phrases
+- Generic wording without concrete details
 
-Bonus logic:
+Expected examples:
 
-- `< 50` score: `0%`
-- `50-69` score: `5%`
-- `70-84` score: `10%`
-- `85+` score: `15%`
+- `Very good` scores low but not zero.
+- `very good I used it for 3 years` scores around the middle range because it includes real usage duration.
+- `I used this power bank for 3 years. Battery lasts long, but it charges slowly. Good for travel.` scores high because it includes usage, detail, pros, cons, and advice.
+- `Пользуюсь месяц, качество хорошее, но доставка была долгой. За свою цену нормально.` scores high because it is specific and balanced.
+- `Өте жақсы, бір ай қолдандым` receives a reasonable score because Kazakh usage and positive signals are detected.
 
-Because pros and cons are evaluated separately, a negative review can still earn a strong score if it is detailed and useful.
+## Bonus Logic
 
-## Project Structure
+- Score below `45`: `0%`
+- Score `45-64`: `5%`
+- Score `65-84`: `10%`
+- Score `85-100`: `10%` for normal users
+- Top 3 leaderboard users can unlock up to `15%`
+
+The app does not reward positivity by itself. A negative but detailed and constructive review can unlock a bonus.
+
+## Leaderboard Logic
+
+Monthly points prioritize quality:
 
 ```text
-src/
-  components/
-    ReviewCard.jsx
-    SectionHeading.jsx
-    StarRating.jsx
-  data/
-    sampleData.js
-  utils/
-    reviewEngine.js
-    storage.js
-  App.jsx
-  index.css
-  main.jsx
+monthly points = average quality + helpful likes bonus + review count bonus + consistency bonus
 ```
+
+Average quality is the main factor, while helpful likes and consistency provide smaller boosts. This keeps high-volume low-quality reviewing from winning.
+
+## Mobile-First Design
+
+Review Booster is built as a mobile app experience:
+
+- first-run welcome/profile setup
+- floating bottom navigation
+- tabbed screens without page reloads
+- Home, Feed, Leaderboard, Dashboard, and Profile tabs
+- dark premium theme with lime accents
+- light warm theme with orange/gold accents
+- responsive centered app shell on laptop and desktop
 
 ## Run Locally
 
 ```bash
 npm install
-npm run dev
+npm run dev -- --host 0.0.0.0
 ```
 
-Build for production:
+Then open the local Vite URL in your browser.
+
+## Open On Phone
+
+1. Connect your phone and computer to the same Wi-Fi.
+2. Run:
+
+```bash
+npm run dev -- --host 0.0.0.0
+```
+
+3. In the terminal, find the Vite `Network` URL.
+4. Open that `Network` URL in your phone browser.
+
+## Build
 
 ```bash
 npm run build
 ```
-
-## Hackathon Pitch Summary
-
-Review Booster helps brands collect better review content without encouraging fake positivity. Customers get rewarded for being helpful, future buyers get clearer decision support, and businesses get structured insight on what to fix, what to promote, and which reviewers build the most trust.

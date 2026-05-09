@@ -1,76 +1,84 @@
-export const CURRENT_REVIEWER = {
-  name: 'Damir',
-  headline: 'Fair reviewer focused on useful feedback',
-}
-
-export const PRODUCT_OPTIONS = [
-  'Wireless Headphones',
-  'Running Sneakers',
-  'Power Bank',
-  'Hoodie',
-  'Backpack',
-  'Coffee Machine',
-]
-
 export const SAMPLE_REVIEW_SEEDS = [
   {
     id: 'seed-ayan-1',
-    author: 'Ayan',
-    product: 'Wireless Headphones',
+    authorFirstName: 'Ayan',
+    authorLastName: 'Sabit',
+    category: 'marketplace',
+    placeName: 'Kaspi',
+    itemName: 'Wireless headphones',
     rating: 4,
-    helpfulLikes: 6,
-    createdAt: '2026-05-05T10:20:00.000Z',
+    helpfulLikes: 12,
+    createdAt: '2026-05-02T10:20:00.000Z',
     text:
-      'Used these headphones for two weeks on my commute and in the office. The battery lasted around 28 hours, the cushions stayed comfortable, noise cancellation softened bus rumble, and calls sounded clear. Bass is a little heavy and the case scratches easily, but they are a strong value if you want travel headphones at this price.',
+      'I used these headphones for two weeks on my commute. Battery lasts almost 28 hours and calls are clear, but the case scratches easily. Good for travel if you want strong value.',
   },
   {
     id: 'seed-damir-1',
-    author: 'Damir',
-    product: 'Running Sneakers',
+    authorFirstName: 'Damir',
+    authorLastName: 'Torekhan',
+    category: 'store',
+    placeName: 'Mega Sport',
+    itemName: 'Sneakers',
     rating: 3,
     helpfulLikes: 8,
-    createdAt: '2026-05-06T08:15:00.000Z',
+    createdAt: '2026-05-04T08:15:00.000Z',
     text:
-      'Ran 18 km across three sessions. Grip is solid on dry pavement and the foam feels light, but the toe box is narrower than expected and my right heel rubbed after 40 minutes. I would recommend going half a size up if you have wide feet.',
+      'Ran 18 km across three sessions. Grip is solid and the foam feels light, but the toe box is narrow and my heel rubbed after 40 minutes. I recommend going half a size up.',
   },
   {
     id: 'seed-aruzhan-1',
-    author: 'Aruzhan',
-    product: 'Coffee Machine',
+    authorFirstName: 'Aruzhan',
+    authorLastName: 'Murat',
+    category: 'cafe',
+    placeName: 'Bean Room',
+    itemName: 'Coffee',
     rating: 4,
     helpfulLikes: 9,
     createdAt: '2026-05-06T17:00:00.000Z',
     text:
-      'After a week of daily use, the coffee tastes great and the milk frother is quick. Setup was simple and the design looks premium on the kitchen counter. The water tank could be larger, so families may need to refill often.',
+      'The latte was tasty and the atmosphere was pleasant. Staff served it fast, but the portion felt small for the price. Good place for a quick meeting near the center.',
   },
   {
     id: 'seed-dias-1',
-    author: 'Dias',
-    product: 'Backpack',
-    rating: 4,
-    helpfulLikes: 5,
+    authorFirstName: 'Dias',
+    authorLastName: 'Omar',
+    category: 'service',
+    placeName: 'Swift Delivery',
+    itemName: 'Delivery',
+    rating: 3,
+    helpfulLikes: 6,
     createdAt: '2026-05-07T14:05:00.000Z',
     text:
-      'Used it for university and one weekend trip. The laptop sleeve is padded, the zippers feel durable, and the straps stay comfortable. Delivery took four days longer than promised, and I wish the side pocket held a bigger water bottle.',
+      'Ordered delivery after work. The courier was polite and packaging was clean, but the order arrived 25 minutes late. Suitable when speed is not critical.',
   },
   {
     id: 'seed-alina-1',
-    author: 'Alina',
-    product: 'Hoodie',
+    authorFirstName: 'Alina',
+    authorLastName: 'Kim',
+    category: 'marketplace',
+    placeName: 'Wildberries',
+    itemName: 'Hoodie',
     rating: 5,
-    helpfulLikes: 4,
+    helpfulLikes: 5,
     createdAt: '2026-05-08T09:30:00.000Z',
     text:
-      'Fabric is soft, stitching is neat, and the color still looks rich after two washes. The fit is slightly oversized, which I like, but the hood opening could be deeper for windy days. Good option if comfort matters more than a sharp slim fit.',
-  },
-  {
-    id: 'seed-ayan-2',
-    author: 'Ayan',
-    product: 'Power Bank',
-    rating: 3,
-    helpfulLikes: 5,
-    createdAt: '2026-05-08T16:45:00.000Z',
-    text:
-      'On a 6-hour train ride this 10,000 mAh power bank charged my phone from 18% to 100% twice and still had enough for my earbuds. The USB-C port is fast, the size fits a jacket pocket, and recharging the pack itself took about 2 hours. The battery indicator is hard to read in daylight and the body gets warm near the end of a full cycle, so I would not rely on it for a laptop. Good value if you need backup power for travel, just keep in mind the included cable is short.',
+      'Fabric is soft, stitching is neat, and the color stayed rich after two washes. The fit is oversized, so choose a smaller size if you want a tighter look.',
   },
 ]
+
+export const CATEGORY_OPTIONS = ['marketplace', 'store', 'cafe', 'service']
+
+export const MARKETPLACES = ['Kaspi', 'Wildberries', 'Ozon', 'Amazon', 'AliExpress', 'Other']
+export const MARKETPLACE_PRODUCTS = [
+  'Wireless headphones',
+  'Sneakers',
+  'Power bank',
+  'Hoodie',
+  'Backpack',
+  'Coffee machine',
+  'Other',
+]
+
+export const STORE_PRODUCTS = ['Clothes', 'Shoes', 'Electronics', 'Cosmetics', 'Accessories', 'Other']
+export const CAFE_ITEMS = ['Coffee', 'Tea', 'Burger', 'Pizza', 'Dessert', 'Breakfast', 'Other']
+export const SERVICE_TYPES = ['Delivery', 'Beauty', 'Education', 'Repair', 'Fitness', 'Other']
