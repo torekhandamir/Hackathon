@@ -642,13 +642,16 @@ textarea:focus {
   font-weight: 800;
 }
 
-.rank-card {
-  grid-template-columns: 48px 1fr auto;
-  align-items: center;
-}
-
 .rank-card.current {
   border-color: color-mix(in srgb, var(--accent) 58%, transparent);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.rank-card-top {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
 }
 
 .rank-number {
@@ -670,6 +673,43 @@ textarea:focus {
   display: block;
   color: var(--text);
   font-size: 22px;
+}
+
+.rank-bar {
+  height: 14px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+    var(--soft);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.rank-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 34%, transparent);
+  transition: width 420ms ease;
+}
+
+.rank-badge {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--soft));
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rank-1 {
+  color: var(--accent-text);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 
 .mini-stats {

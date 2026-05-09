@@ -2,7 +2,7 @@ import { SAMPLE_REVIEW_SEEDS } from '../data/sampleData'
 import { createReviewRecord } from './reviewEngine'
 
 const PROFILE_KEY = 'review-booster.profile'
-const REVIEWS_KEY = 'review-booster.reviews.v2'
+const REVIEWS_KEY = 'review-booster.reviews.v3'
 const LIKED_REVIEWS_KEY = 'review-booster.likedReviews.v2'
 
 const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'

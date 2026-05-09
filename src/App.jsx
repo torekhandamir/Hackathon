@@ -41,9 +41,6 @@ const copy = {
     welcomeText: 'Получайте бонусы за отзывы, которые действительно помогают другим покупателям.',
     firstName: 'Имя',
     lastName: 'Фамилия',
-    role: 'Роль',
-    customer: 'Покупатель',
-    business: 'Бизнес',
     chooseLanguage: 'Язык',
     chooseTheme: 'Тема',
     dark: 'Темная',
@@ -103,7 +100,6 @@ const copy = {
     trusted: 'Надежный автор',
     expert: 'Эксперт отзывов',
     legend: 'Легенда отзывов',
-    businessInsights: 'Бизнес-аналитика',
     activityOverview: 'Обзор активности',
     customerSignals: 'Сигналы клиентов',
     totalReviews: 'Всего отзывов',
@@ -129,9 +125,6 @@ const copy = {
     welcomeText: 'Earn rewards for reviews that truly help other customers.',
     firstName: 'First name',
     lastName: 'Last name',
-    role: 'Role',
-    customer: 'Customer',
-    business: 'Business',
     chooseLanguage: 'Choose language',
     chooseTheme: 'Choose theme',
     dark: 'Dark mode',
@@ -140,7 +133,7 @@ const copy = {
     home: 'Home',
     feed: 'Feed',
     leaderboard: 'Leaderboard',
-    dashboard: 'Dashboard',
+    dashboard: 'Insights',
     profile: 'Profile',
     hi: 'Hi',
     purchaseQuestion: 'What did you purchase?',
@@ -191,9 +184,7 @@ const copy = {
     trusted: 'Trusted Reviewer',
     expert: 'Review Expert',
     legend: 'Review Legend',
-    businessInsights: 'Business insights',
     activityOverview: 'Activity overview',
-    customerSignals: 'Customer signals',
     totalReviews: 'Total reviews',
     averageReviewQuality: 'Average review quality',
     couponsIssued: 'Coupons issued',
@@ -217,9 +208,6 @@ const copy = {
     welcomeText: 'Басқа сатып алушыларға көмектесетін пікірлер үшін бонус алыңыз.',
     firstName: 'Аты',
     lastName: 'Тегі',
-    role: 'Рөл',
-    customer: 'Сатып алушы',
-    business: 'Бизнес',
     chooseLanguage: 'Тіл',
     chooseTheme: 'Тақырып',
     dark: 'Қараңғы',
@@ -279,7 +267,6 @@ const copy = {
     trusted: 'Сенімді автор',
     expert: 'Пікір эксперті',
     legend: 'Пікір аңызы',
-    businessInsights: 'Бизнес аналитика',
     activityOverview: 'Белсенділік',
     customerSignals: 'Клиент сигналдары',
     totalReviews: 'Барлық пікір',
@@ -358,6 +345,10 @@ const buildReviewerStats = (reviews, profile) => {
 
   const profileName = profile ? `${profile.firstName} ${profile.lastName}`.trim() : ''
 
+  if (profileName && !grouped[profileName]) {
+    grouped[profileName] = []
+  }
+
   return Object.entries(grouped)
     .map(([name, userReviews]) => {
       const reviewCount = userReviews.length
@@ -366,10 +357,12 @@ const buildReviewerStats = (reviews, profile) => {
       const averageQuality = Math.round(
         userReviews.reduce((sum, review) => sum + review.score, 0) / Math.max(reviewCount, 1),
       )
-      const reviewCountBonus = Math.min(reviewCount * 2, 10)
-      const helpfulBonus = Math.min(helpfulLikes * 0.7, 12)
-      const consistencyBonus = Math.min(userReviews.filter((review) => review.score >= 65).length * 2, 8)
-      const monthlyPoints = Math.round(averageQuality + helpfulBonus + reviewCountBonus + consistencyBonus)
+      const reviewCountBonus = Math.min(reviewCount, 6) * 5
+      const helpfulBonus = Math.min(helpfulLikes, 24) * 2
+      const consistencyBonus = Math.min(userReviews.filter((review) => review.score >= 65).length * 4, 16)
+      const monthlyPoints = Math.round(
+        averageQuality * 0.6 + helpfulBonus + reviewCountBonus + consistencyBonus,
+      )
 
       return {
         name,
@@ -477,7 +470,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 function App() {
   const [profile, setProfile] = useState(() => loadProfile())
   const [setup, setSetup] = useState(
-    () => loadProfile() ?? { firstName: '', lastName: '', role: 'customer', language: 'ru', theme: 'dark' },
+    () => loadProfile() ?? { firstName: '', lastName: '', language: 'ru', theme: 'dark' },
   )
   const [activeTab, setActiveTab] = useState('home')
   const [reviews, setReviews] = useState(() => loadReviews())
@@ -636,7 +629,7 @@ function App() {
   const resetProfile = () => {
     clearProfile()
     setProfile(null)
-    setSetup({ firstName: '', lastName: '', role: 'customer', language: 'ru', theme: 'dark' })
+    setSetup({ firstName: '', lastName: '', language: 'ru', theme: 'dark' })
     setActiveTab('home')
   }
 
@@ -659,15 +652,6 @@ function App() {
               <input value={setup.lastName} onChange={(event) => setSetup({ ...setup, lastName: event.target.value })} />
             </Field>
           </div>
-
-          <Field label={copy[setup.language].role}>
-            <SegmentedControl
-              value={setup.role}
-              options={['customer', 'business']}
-              onChange={(role) => setSetup({ ...setup, role })}
-              labelFor={(role) => copy[setup.language][role]}
-            />
-          </Field>
 
           <Field label={copy[setup.language].chooseLanguage}>
             <SegmentedControl
@@ -980,26 +964,40 @@ function ReviewCard({ t, language, review, liked, onHelpful }) {
 }
 
 function LeaderboardScreen({ t, reviewers }) {
+  const maxPoints = Math.max(...reviewers.map((reviewer) => reviewer.monthlyPoints), 1)
+
   return (
     <div className="stack">
       <ScreenTitle title={t.topReviewers} subtitle={t.thisMonth} />
       {reviewers.map((reviewer) => (
         <article key={reviewer.name} className={reviewer.isCurrentUser ? 'rank-card current' : 'rank-card'}>
-          <div className="rank-number">
-            {reviewer.rank <= 3 ? <Crown size={20} /> : reviewer.rank}
+          <div className="rank-card-top">
+            <div className="rank-number">
+              {reviewer.rank <= 3 ? <Crown size={20} /> : reviewer.rank}
+            </div>
+            <div className="rank-info">
+              <strong>{reviewer.name}</strong>
+              <span>{t[levelKeyByEnglish[reviewer.levelKey] ?? reviewer.levelKey] ?? t[reviewer.levelKey]}</span>
+            </div>
+            <div className="rank-points">
+              <strong>{reviewer.monthlyPoints}</strong>
+              <span>{t.monthlyPoints}</span>
+            </div>
           </div>
-          <div className="rank-info">
-            <strong>{reviewer.name}</strong>
-            <span>{t[levelKeyByEnglish[reviewer.levelKey] ?? reviewer.levelKey] ?? t[reviewer.levelKey]}</span>
+          <div className="rank-bar" aria-label={`${reviewer.monthlyPoints} ${t.monthlyPoints}`}>
+            <span style={{ width: `${Math.max(8, (reviewer.monthlyPoints / maxPoints) * 100)}%` }} />
           </div>
-          <div className="rank-points">
-            <strong>{reviewer.monthlyPoints}</strong>
-            <span>{t.monthlyPoints}</span>
-          </div>
+          {reviewer.rank <= 3 && (
+            <div className={`rank-badge rank-${reviewer.rank}`}>
+              {reviewer.rank === 1 ? <Trophy size={15} /> : <Crown size={15} />}
+              Top {reviewer.rank}
+            </div>
+          )}
           <div className="mini-stats">
             <span>{t.reviews}: {reviewer.reviewCount}</span>
             <span>{t.averageQuality}: {reviewer.averageQuality}</span>
             <span>{t.likes}: {reviewer.helpfulLikes}</span>
+            <span>{t.totalPoints}: {reviewer.totalPoints}</span>
           </div>
         </article>
       ))}
@@ -1010,7 +1008,7 @@ function LeaderboardScreen({ t, reviewers }) {
 function DashboardScreen({ t, dashboard, categoryCounts, complaints, praises, topReviews, language }) {
   return (
     <div className="stack">
-      <ScreenTitle title={t.businessInsights} subtitle={t.customerSignals} />
+      <ScreenTitle title={t.dashboard} subtitle={t.activityOverview} />
       <div className="metrics-grid">
         <Metric label={t.totalReviews} value={dashboard.totalReviews} />
         <Metric label={t.averageReviewQuality} value={dashboard.averageQuality} />
@@ -1040,7 +1038,6 @@ function ProfileScreen({ t, profile, currentReviewer, updateProfile, resetProfil
       <section className="profile-card">
         <div className="avatar">{profile.firstName.charAt(0)}{profile.lastName.charAt(0)}</div>
         <h1>{profile.firstName} {profile.lastName}</h1>
-        <p>{profile.role === 'business' ? t.business : t.customer}</p>
         <span>{t.savedDevice}</span>
       </section>
       <div className="metrics-grid">
