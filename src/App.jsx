@@ -965,42 +965,78 @@ function ReviewCard({ t, language, review, liked, onHelpful }) {
 
 function LeaderboardScreen({ t, reviewers }) {
   const maxPoints = Math.max(...reviewers.map((reviewer) => reviewer.monthlyPoints), 1)
+  const topThree = reviewers.slice(0, 3)
 
   return (
-    <div className="stack">
+    <div className="stack leaderboard-screen">
       <ScreenTitle title={t.topReviewers} subtitle={t.thisMonth} />
-      {reviewers.map((reviewer) => (
-        <article key={reviewer.name} className={reviewer.isCurrentUser ? 'rank-card current' : 'rank-card'}>
-          <div className="rank-card-top">
-            <div className="rank-number">
-              {reviewer.rank <= 3 ? <Crown size={20} /> : reviewer.rank}
+
+      <section className="podium-strip">
+        {topThree.map((reviewer) => (
+          <div key={reviewer.name} className={`podium-card podium-${reviewer.rank}`}>
+            <div className="podium-icon">
+              {reviewer.rank === 1 ? <Trophy size={22} /> : <Crown size={20} />}
             </div>
-            <div className="rank-info">
-              <strong>{reviewer.name}</strong>
-              <span>{t[levelKeyByEnglish[reviewer.levelKey] ?? reviewer.levelKey] ?? t[reviewer.levelKey]}</span>
-            </div>
-            <div className="rank-points">
-              <strong>{reviewer.monthlyPoints}</strong>
-              <span>{t.monthlyPoints}</span>
-            </div>
+            <span>#{reviewer.rank}</span>
+            <strong>{reviewer.name.split(' ')[0]}</strong>
+            <em>{reviewer.monthlyPoints}</em>
           </div>
-          <div className="rank-bar" aria-label={`${reviewer.monthlyPoints} ${t.monthlyPoints}`}>
-            <span style={{ width: `${Math.max(8, (reviewer.monthlyPoints / maxPoints) * 100)}%` }} />
-          </div>
-          {reviewer.rank <= 3 && (
-            <div className={`rank-badge rank-${reviewer.rank}`}>
-              {reviewer.rank === 1 ? <Trophy size={15} /> : <Crown size={15} />}
-              Top {reviewer.rank}
-            </div>
-          )}
-          <div className="mini-stats">
-            <span>{t.reviews}: {reviewer.reviewCount}</span>
-            <span>{t.averageQuality}: {reviewer.averageQuality}</span>
-            <span>{t.likes}: {reviewer.helpfulLikes}</span>
-            <span>{t.totalPoints}: {reviewer.totalPoints}</span>
-          </div>
-        </article>
-      ))}
+        ))}
+      </section>
+
+      <section className="rank-list">
+        {reviewers.map((reviewer) => {
+          const width = Math.max(8, (reviewer.monthlyPoints / maxPoints) * 100)
+          const movement = reviewer.rank % 3 === 0 ? '+2' : reviewer.rank % 2 === 0 ? '+1' : 'new'
+
+          return (
+            <article
+              key={reviewer.name}
+              className={[
+                'rank-card',
+                reviewer.isCurrentUser ? 'current' : '',
+                reviewer.rank <= 3 ? `top-rank top-${reviewer.rank}` : '',
+              ].filter(Boolean).join(' ')}
+            >
+              <div className="rank-card-top">
+                <div className="rank-number">
+                  {reviewer.rank <= 3 ? <Crown size={20} /> : reviewer.rank}
+                </div>
+                <div className="rank-info">
+                  <strong>{reviewer.name}</strong>
+                  <span>{t[levelKeyByEnglish[reviewer.levelKey] ?? reviewer.levelKey] ?? t[reviewer.levelKey]}</span>
+                </div>
+                <div className="rank-points">
+                  <strong>{reviewer.monthlyPoints}</strong>
+                  <span>{t.monthlyPoints}</span>
+                </div>
+              </div>
+
+              <div className="rank-bar-row">
+                <div className="rank-bar" aria-label={`${reviewer.monthlyPoints} ${t.monthlyPoints}`}>
+                  <span style={{ width: `${width}%` }} />
+                </div>
+                <span className={movement === 'new' ? 'move-chip neutral' : 'move-chip'}>{movement}</span>
+              </div>
+
+              <div className="rank-detail-row">
+                {reviewer.rank <= 3 && (
+                  <div className={`rank-badge rank-${reviewer.rank}`}>
+                    {reviewer.rank === 1 ? <Trophy size={15} /> : <Crown size={15} />}
+                    Top {reviewer.rank}
+                  </div>
+                )}
+                <div className="mini-stats">
+                  <span>{t.reviews}: {reviewer.reviewCount}</span>
+                  <span>{t.averageQuality}: {reviewer.averageQuality}</span>
+                  <span>{t.likes}: {reviewer.helpfulLikes}</span>
+                  <span>{t.totalPoints}: {reviewer.totalPoints}</span>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </section>
     </div>
   )
 }
