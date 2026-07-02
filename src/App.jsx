@@ -67,7 +67,7 @@ const copy = {
     publishing: 'Публикуем отзыв',
     checking: 'Проверяем полезные детали',
     calculating: 'Считаем качество',
-    rewardReady: 'Решение по бонусу готово',
+    rewardReady: 'Завершаем AI-оценку',
     published: 'Отзыв опубликован',
     scoreLine: 'Ваш отзыв получил',
     bonus: 'Бонус',
@@ -144,7 +144,7 @@ const copy = {
     publishing: 'Publishing review',
     checking: 'Checking useful details',
     calculating: 'Calculating quality score',
-    rewardReady: 'Reward decision ready',
+    rewardReady: 'Finalizing AI evaluation',
     published: 'Review published',
     scoreLine: 'Your review scored',
     bonus: 'Bonus',
@@ -221,7 +221,7 @@ const copy = {
     publishing: 'Пікір жариялануда',
     checking: 'Пайдалы мәліметтер тексерілуде',
     calculating: 'Сапа бағасы есептелуде',
-    rewardReady: 'Бонус шешімі дайын',
+    rewardReady: 'AI бағалауы аяқталуда',
     published: 'Пікір жарияланды',
     scoreLine: 'Сіздің пікіріңіз алды',
     bonus: 'Бонус',
@@ -279,7 +279,7 @@ const navItems = [
   ['profile', User],
 ]
 
-const processingSteps = ['publishing', 'checking', 'calculating', 'rewardReady']
+const processingSteps = ['publishing', 'checking', 'calculating']
 const levelLabel = { beginner: 'beginner', trusted: 'trusted', expert: 'expert', legend: 'legend' }
 const badgeCopyKeys = {
   'Detail Master': 'detailMaster',
@@ -970,7 +970,7 @@ function ResultModal({ t, review, processing, processingStep, language, onClose,
           <>
             <div className="loader-ring" />
             <h2>{t[processingSteps[processingStep]]}</h2>
-            <ProgressBar value={(processingStep + 1) * 25} />
+            <ProgressBar value={Math.min(92, (processingStep + 1) * 30)} />
           </>
         ) : (
           <>

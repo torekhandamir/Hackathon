@@ -13,6 +13,12 @@ Important rules:
 - Do not reward positive reviews automatically.
 - A detailed 4-star review with pros and cons can get a high score.
 - A 5-star review like "good" should get a low score.
+- Be moderately strict. Do not give coupons to reviews that are polite but generic.
+- Reviews under 12 words should usually be rejected or scored below 25 unless they contain unusually concrete facts.
+- Reviews under 25 words should usually stay below 45 unless they include real usage context, product/service details, and one useful tradeoff.
+- Reviews without concrete evidence such as time used, price, delivery, service details, taste, size, quality, staff, battery, material, or a clear use case should not score above 55.
+- Scores above 70 require clear specificity, real experience details, and usefulness for future customers.
+- Scores above 85 require rich detail, authentic evidence, balance or tradeoff, and practical advice.
 - Reject gibberish, spam, offensive text, repeated words, meaningless text, or inappropriate content.
 - The bonus is for useful, honest, detailed reviews, not for positive reviews.
 - Use the input fields: review text, star rating, category, place, product, selected language.
@@ -83,6 +89,30 @@ const textMap = (value: any) => ({
 
 const stringArray = (value: any) => (Array.isArray(value) ? value.filter((item) => typeof item === 'string').slice(0, 8) : [])
 
+const countWords = (text: string) => text.match(/[\p{L}\p{N}'-]+/gu)?.length ?? 0
+
+const hasConcreteEvidence = (text: string) =>
+  /\d/.test(text) ||
+  /\b(day|days|week|weeks|month|months|year|years|hour|hours|minute|minutes|price|delivery|service|taste|size|quality|battery|material|staff|portion|packaging|charge|charging|used|using|ordered|bought)\b/i.test(text) ||
+  /(день|дня|недел|месяц|год|лет|цена|доставка|сервис|вкус|размер|качество|батарея|материал|персонал|упаковка|пользуюсь|купил|заказал)/i.test(text) ||
+  /(күн|апта|ай|жыл|баға|жеткізу|қызмет|дәм|өлшем|сапа|материал|қолдандым|сатып|тапсырыс)/i.test(text)
+
+const applyStrictScoreCaps = (score: number, reviewText: string, breakdown: Record<(typeof breakdownKeys)[number], number>) => {
+  const words = countWords(reviewText)
+  const concrete = hasConcreteEvidence(reviewText)
+  let capped = score
+
+  if (words < 6) capped = Math.min(capped, 15)
+  else if (words < 12 && !concrete) capped = Math.min(capped, 25)
+  else if (words < 25 && (!concrete || breakdown.experienceDetails < 10 || breakdown.usefulness < 10)) capped = Math.min(capped, 45)
+
+  if (!concrete) capped = Math.min(capped, 55)
+  if (capped > 70 && (breakdown.specificity < 13 || breakdown.experienceDetails < 13 || breakdown.usefulness < 13)) capped = 70
+  if (capped > 85 && (breakdown.balance < 14 || breakdown.specificity < 16 || breakdown.experienceDetails < 16)) capped = 85
+
+  return capped
+}
+
 const getConfiguredModel = () => {
   const configured = process.env.OPENAI_MODEL?.trim() ?? ''
   return PLACEHOLDER_MODELS.has(configured.toLowerCase()) ? DEFAULT_OPENAI_MODEL : configured
@@ -111,7 +141,7 @@ const parseModelJson = (content: string) => {
   }
 }
 
-const normalizeEvaluation = (raw: any) => {
+const normalizeEvaluation = (raw: any, reviewText: string) => {
   if (!raw || typeof raw !== 'object' || typeof raw.publishable !== 'boolean') {
     throw new Error('OpenAI JSON is missing required fields.')
   }
@@ -126,6 +156,8 @@ const normalizeEvaluation = (raw: any) => {
   if (Math.abs(aiQualityScore - breakdownSum) > 12) {
     aiQualityScore = breakdownSum
   }
+
+  aiQualityScore = applyStrictScoreCaps(aiQualityScore, reviewText, breakdown)
 
   if (!raw.publishable) {
     aiQualityScore = Math.min(aiQualityScore, 20)
@@ -223,7 +255,7 @@ export default async function handler(req: any, res: any) {
     const content = completion.choices[0]?.message?.content
     if (!content) throw new Error('OpenAI returned an empty response.')
 
-    return res.status(200).json(normalizeEvaluation(parseModelJson(content)))
+    return res.status(200).json(normalizeEvaluation(parseModelJson(content), reviewText.trim()))
   } catch (error) {
     console.error('Review evaluation failed:', error)
     const message = error instanceof Error ? error.message : 'Unknown error'
