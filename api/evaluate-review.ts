@@ -1,6 +1,3 @@
-import OpenAI from 'openai'
-import { reviewEvaluationPrompt } from '../src/ai/reviewEvaluationPrompt'
-
 const DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini'
 const PLACEHOLDER_MODELS = new Set(['', 'your_model_here', 'your-model-here', 'model'])
 const languages = new Set(['ru', 'en', 'kz'])
@@ -130,6 +127,10 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: 'OpenAI API key is not configured.', code: 'OPENAI_KEY_MISSING' })
     }
 
+    const [{ default: OpenAI }, { reviewEvaluationPrompt }] = await Promise.all([
+      import('openai'),
+      import('../src/ai/reviewEvaluationPrompt'),
+    ])
     const model = getConfiguredModel()
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const completion = await openai.chat.completions.create({
