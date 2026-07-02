@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import { reviewEvaluationPrompt } from '../src/ai/reviewEvaluationPrompt'
 
 const DEFAULT_OPENAI_MODEL = 'gpt-4.1-mini'
+const PLACEHOLDER_MODELS = new Set(['', 'your_model_here', 'your-model-here', 'model'])
 const languages = new Set(['ru', 'en', 'kz'])
 const breakdownKeys = ['specificity', 'experienceDetails', 'usefulness', 'balance', 'antiSpam'] as const
 
@@ -25,6 +26,23 @@ const textMap = (value: any) => ({
 })
 
 const stringArray = (value: any) => (Array.isArray(value) ? value.filter((item) => typeof item === 'string').slice(0, 8) : [])
+
+const getConfiguredModel = () => {
+  const configured = process.env.OPENAI_MODEL?.trim() ?? ''
+  return PLACEHOLDER_MODELS.has(configured.toLowerCase()) ? DEFAULT_OPENAI_MODEL : configured
+}
+
+const getBody = (req: any) => {
+  if (req.body && typeof req.body === 'object') return req.body
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body)
+    } catch {
+      return null
+    }
+  }
+  return null
+}
 
 const parseModelJson = (content: string) => {
   const trimmed = content.trim()
@@ -78,13 +96,23 @@ const normalizeEvaluation = (raw: any) => {
 }
 
 export default async function handler(req: any, res: any) {
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      ok: true,
+      route: '/api/evaluate-review',
+      openaiKeyConfigured: Boolean(process.env.OPENAI_API_KEY),
+      model: getConfiguredModel(),
+    })
+  }
+
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST')
+    res.setHeader('Allow', 'GET, POST')
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const { reviewText, rating, category, place, product, language } = req.body ?? {}
+    const body = getBody(req)
+    const { reviewText, rating, category, place, product, language } = body ?? {}
 
     if (
       typeof reviewText !== 'string' ||
@@ -95,16 +123,17 @@ export default async function handler(req: any, res: any) {
       typeof product !== 'string' ||
       !languages.has(language)
     ) {
-      return res.status(400).json({ error: 'Invalid review evaluation input.' })
+      return res.status(400).json({ error: 'Invalid review evaluation input.', code: 'INVALID_INPUT' })
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: 'OpenAI API key is not configured.' })
+      return res.status(500).json({ error: 'OpenAI API key is not configured.', code: 'OPENAI_KEY_MISSING' })
     }
 
+    const model = getConfiguredModel()
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL,
+      model,
       temperature: 0.2,
       response_format: { type: 'json_object' },
       messages: [
@@ -129,6 +158,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json(normalizeEvaluation(parseModelJson(content)))
   } catch (error) {
     console.error('Review evaluation failed:', error)
-    return res.status(502).json({ error: 'AI evaluation failed.' })
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return res.status(502).json({ error: 'AI evaluation failed.', code: 'OPENAI_EVALUATION_FAILED', detail: message })
   }
 }
