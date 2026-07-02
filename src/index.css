@@ -621,13 +621,24 @@ textarea:focus {
 
 .score-badge {
   min-width: 52px;
-  height: 42px;
+  min-height: 42px;
   border-radius: 16px;
   background: var(--accent);
   color: var(--accent-text);
   display: grid;
   place-items: center;
   font-weight: 900;
+  line-height: 1.05;
+  padding: 6px 8px;
+}
+
+.score-badge small {
+  display: block;
+  max-width: 64px;
+  color: var(--accent-text);
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.75;
 }
 
 .review-card p {

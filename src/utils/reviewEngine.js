@@ -263,12 +263,12 @@ export const getQualityLevel = (score) => {
   return 'Review Legend'
 }
 
-export const getBonusDecision = (score, maxBonusPercent = 10) => {
+export const getBonusDecision = (score, maxBonusPercent = 15) => {
   let percent = 0
 
-  if (score >= 85) percent = maxBonusPercent >= 15 ? 15 : 10
-  else if (score >= 65) percent = 7
-  else if (score >= 45) percent = 5
+  if (score >= 85) percent = 15
+  else if (score >= 70) percent = 10
+  else if (score >= 40) percent = 5
 
   percent = Math.min(percent, maxBonusPercent)
 
@@ -281,8 +281,7 @@ export const getBonusDecision = (score, maxBonusPercent = 10) => {
 
 export const generateCouponCode = (percent) => {
   if (!percent) return null
-  const token = Math.random().toString(36).slice(2, 6).toUpperCase()
-  return `RB-${percent}-${token}`
+  return `RB${percent}`
 }
 
 export const scoreReview = ({ text = '', rating = 0 }) => {
@@ -405,3 +404,52 @@ export const createReviewRecord = (input, options = {}) => {
     metrics: analysis.metrics,
   }
 }
+
+export const fallbackReviewEvaluationForDevOnly = scoreReview
+
+export const createReviewRecordFromAiEvaluation = (input, evaluation) => {
+  const score = clamp(evaluation.aiQualityScore, 0, 100)
+  const bonus = getBonusDecision(score, 15)
+
+  return {
+    id: input.id ?? `review-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    authorFirstName: input.authorFirstName,
+    authorLastName: input.authorLastName,
+    category: input.category,
+    placeId: input.placeId,
+    itemId: input.itemId,
+    placeName: input.placeName,
+    itemName: input.itemName,
+    rating: input.rating,
+    text: input.text.trim().replace(/\s+/g, ' '),
+    helpfulLikes: input.helpfulLikes ?? 0,
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    score,
+    aiQualityScore: score,
+    qualityLevel: getQualityLevel(score),
+    bonusPercent: bonus.percent,
+    bonusLabel: bonus.label,
+    couponCode: bonus.approved ? bonusForPercent(bonus.percent) : null,
+    publishable: evaluation.publishable,
+    breakdown: evaluation.breakdown,
+    aiExplanation: evaluation.aiExplanation,
+    suggestions: evaluation.suggestions,
+    tags: evaluation.tags ?? [],
+    complaints: evaluation.complaints ?? [],
+    praises: evaluation.praises ?? [],
+    rejectionReason: evaluation.rejectionReason,
+    signals: {
+      hasSpecificDetails: (evaluation.breakdown?.specificity ?? 0) >= 12,
+      hasUsageExperience: (evaluation.breakdown?.experienceDetails ?? 0) >= 12,
+      hasProsAndCons: (evaluation.breakdown?.balance ?? 0) >= 12,
+      helpfulForBuyers: (evaluation.breakdown?.usefulness ?? 0) >= 12,
+      lowSpamRisk: (evaluation.breakdown?.antiSpam ?? 0) >= 12,
+    },
+    metrics: {
+      source: 'openai',
+      breakdown: evaluation.breakdown,
+    },
+  }
+}
+
+const bonusForPercent = (percent) => (percent ? `RB${percent}` : null)

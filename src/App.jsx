@@ -24,7 +24,7 @@ import {
   STORE_PLACES,
   STORE_PRODUCTS,
 } from './data/appData'
-import { createReviewRecord } from './utils/reviewEngine'
+import { createReviewRecordFromAiEvaluation } from './utils/reviewEngine'
 import {
   clearProfile,
   loadLikedReviewIds,
@@ -288,6 +288,57 @@ const badgeCopyKeys = {
   'Top Reviewer': 'topReviewer',
 }
 
+const aiText = {
+  ru: {
+    aiQualityScore: 'AI-оценка качества',
+    aiExplanation: 'AI-объяснение',
+    aiSuggestions: 'AI-советы',
+    rejected: 'Отзыв отклонен',
+    aiUnavailable: 'AI-оценка временно недоступна. Попробуйте ещё раз.',
+    specificity: 'Конкретика',
+    experienceDetails: 'Детали опыта',
+    usefulness: 'Полезность',
+    balance: 'Баланс',
+    antiSpam: 'Антиспам',
+    aiInsight: 'AI-инсайт',
+    aiRecommendation: 'AI-рекомендация',
+    aiInsightPrefix: 'Чаще всего AI видит тему:',
+    aiInsightEmpty: 'AI-темы появятся после публикации оцененных отзывов.',
+  },
+  en: {
+    aiQualityScore: 'AI Quality Score',
+    aiExplanation: 'AI explanation',
+    aiSuggestions: 'AI suggestions',
+    rejected: 'Review rejected',
+    aiUnavailable: 'AI evaluation is temporarily unavailable. Please try again.',
+    specificity: 'Specificity',
+    experienceDetails: 'Experience details',
+    usefulness: 'Usefulness',
+    balance: 'Balance',
+    antiSpam: 'Anti-spam',
+    aiInsight: 'AI Insight',
+    aiRecommendation: 'AI Recommendation',
+    aiInsightPrefix: 'AI most often detects this theme:',
+    aiInsightEmpty: 'AI themes will appear after evaluated reviews are published.',
+  },
+  kz: {
+    aiQualityScore: 'AI сапа бағасы',
+    aiExplanation: 'AI түсіндірмесі',
+    aiSuggestions: 'AI кеңестері',
+    rejected: 'Пікір қабылданбады',
+    aiUnavailable: 'AI бағалау уақытша қолжетімсіз. Қайталап көріңіз.',
+    specificity: 'Нақтылық',
+    experienceDetails: 'Тәжірибе деректері',
+    usefulness: 'Пайдалылық',
+    balance: 'Теңгерім',
+    antiSpam: 'Антиспам',
+    aiInsight: 'AI инсайт',
+    aiRecommendation: 'AI ұсыныс',
+    aiInsightPrefix: 'AI ең жиі анықтайтын тақырып:',
+    aiInsightEmpty: 'AI тақырыптары бағаланған пікірлер жарияланғаннан кейін көрінеді.',
+  },
+}
+
 const initialForm = {
   category: 'marketplace',
   marketplace: 'kaspi',
@@ -405,10 +456,24 @@ const countMatches = (reviews, buckets) =>
     .map(([label, words]) => ({
       label,
       count: reviews.reduce((sum, review) => {
-        const text = review.text.toLowerCase()
+        const aiTerms = [...(review.tags ?? []), ...(review.complaints ?? []), ...(review.praises ?? [])].join(' ').toLowerCase()
+        const text = `${review.text} ${aiTerms}`.toLowerCase()
         return sum + (words.some((word) => text.includes(word)) ? 1 : 0)
       }, 0),
     }))
+    .sort((left, right) => right.count - left.count)
+    .slice(0, 3)
+
+const countAiTerms = (reviews, key) =>
+  Object.entries(
+    reviews.flatMap((review) => review[key] ?? []).reduce((counts, term) => {
+      const label = String(term).trim().toLowerCase()
+      if (!label) return counts
+      counts[label] = (counts[label] ?? 0) + 1
+      return counts
+    }, {}),
+  )
+    .map(([label, count]) => ({ label, count }))
     .sort((left, right) => right.count - left.count)
     .slice(0, 3)
 
@@ -490,7 +555,7 @@ function App() {
 
   const language = profile?.language ?? setup.language
   const theme = profile?.theme ?? setup.theme
-  const t = copy[language]
+  const t = { ...copy[language], ...aiText[language] }
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -527,16 +592,20 @@ function App() {
     label: labelOf(category, language),
     count: reviews.filter((review) => review.category === category.id).length,
   })).sort((a, b) => b.count - a.count)
-  const complaints = countMatches(reviews, {
+  const complaintTerms = countAiTerms(reviews, 'complaints')
+  const praiseTerms = countAiTerms(reviews, 'praises')
+  const tagTerms = countAiTerms(reviews, 'tags')
+  const complaints = complaintTerms.length ? complaintTerms : countMatches(reviews, {
     delivery: ['delivery', 'late', 'slow', 'доставка', 'долг', 'жеткізу'],
     battery: ['battery', 'charge', 'microphone', 'батарея', 'заряд', 'микрофон'],
     price: ['expensive', 'price', 'small', 'дорого', 'цена', 'қымбат', 'баға'],
   })
-  const praises = countMatches(reviews, {
+  const praises = praiseTerms.length ? praiseTerms : countMatches(reviews, {
     quality: ['quality', 'clear', 'clean', 'качеств', 'сапа'],
     speed: ['fast', 'quick', 'minutes', 'быстро', 'тез'],
     comfort: ['comfort', 'comfortable', 'soft', 'удоб', 'ыңғайлы'],
   })
+  const aiInsight = tagTerms.length ? `${t.aiInsightPrefix} ${tagTerms[0].label}.` : t.aiInsightEmpty
 
   const setProfileAndPersist = (nextProfile) => {
     setProfile(nextProfile)
@@ -583,39 +652,76 @@ function App() {
     return { placeId, itemId, placeName, itemName }
   }
 
-  const publishReview = () => {
+  const publishReview = async () => {
     const trimmed = form.text.trim()
     if (!trimmed) return
 
     const { placeId, itemId, placeName, itemName } = getSelectedPlaceAndItem()
-    const newReview = createReviewRecord(
-      {
-        authorFirstName: profile.firstName,
-        authorLastName: profile.lastName,
-        category: form.category,
-        placeId,
-        itemId,
-        placeName,
-        itemName,
-        rating: form.rating,
-        text: trimmed,
-      },
-      { maxBonusPercent },
-    )
+    const reviewInput = {
+      authorFirstName: profile.firstName,
+      authorLastName: profile.lastName,
+      category: form.category,
+      placeId,
+      itemId,
+      placeName,
+      itemName,
+      rating: form.rating,
+      text: trimmed,
+    }
 
     setProcessing(true)
     setProcessingStep(0)
+    setResult(null)
 
     processingSteps.forEach((_, index) => {
-      window.setTimeout(() => setProcessingStep(index), 140 * index)
+      window.setTimeout(() => setProcessingStep(index), 180 * index)
     })
 
-    window.setTimeout(() => {
+    try {
+      const response = await fetch('/api/evaluate-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reviewText: trimmed,
+          rating: form.rating,
+          category: labelOf(optionById(CATEGORY_OPTIONS, form.category), language),
+          place: placeName,
+          product: itemName,
+          language,
+        }),
+      })
+
+      if (!response.ok) throw new Error('AI evaluation failed')
+
+      const evaluation = await response.json()
+
+      if (!evaluation.publishable) {
+        setResult({ ...reviewInput, ...evaluation, score: evaluation.aiQualityScore, rejected: true })
+        return
+      }
+
+      const newReview = createReviewRecordFromAiEvaluation(reviewInput, evaluation, { maxBonusPercent })
       setReviews((currentReviews) => [newReview, ...currentReviews])
       setResult(newReview)
       setForm(initialForm)
+    } catch {
+      setResult({
+        ...reviewInput,
+        rejected: true,
+        error: true,
+        score: 0,
+        aiQualityScore: 0,
+        bonusPercent: 0,
+        couponCode: '-',
+        rejectionReason: {
+          ru: aiText.ru.aiUnavailable,
+          en: aiText.en.aiUnavailable,
+          kz: aiText.kz.aiUnavailable,
+        },
+      })
+    } finally {
       setProcessing(false)
-    }, 650)
+    }
   }
 
   const resetProfile = () => {
@@ -713,6 +819,7 @@ function App() {
               complaints={complaints}
               praises={praises}
               topReviews={topReviews}
+              aiInsight={aiInsight}
               language={language}
             />
           )}
@@ -846,6 +953,10 @@ function ResultModal({ t, review, processing, processingStep, language, onClose,
   const displayedScore = review?.score ?? 0
   const hasBonus = (review?.bonusPercent ?? 0) > 0
   const suggestions = review?.suggestions?.[language] ?? []
+  const explanation = review?.aiExplanation?.[language] ?? ''
+  const rejection = review?.rejectionReason?.[language] ?? t.aiUnavailable
+  const breakdown = review?.breakdown ?? {}
+  const isRejected = review?.rejected || review?.publishable === false
 
   return (
     <div className="modal-backdrop">
@@ -866,20 +977,29 @@ function ResultModal({ t, review, processing, processingStep, language, onClose,
             <div className={hasBonus ? 'result-icon success' : 'result-icon'}>
               <Sparkles size={28} />
             </div>
-            <h2>{t.published}</h2>
-            <p>{hasBonus ? `${t.scoreLine} ${displayedScore}/100.` : t.lowResult}</p>
+            <h2>{isRejected ? t.rejected : t.published}</h2>
+            <p>{isRejected ? rejection : `${t.aiQualityScore}: ${displayedScore}/100.`}</p>
             <ProgressBar value={displayedScore} />
-            <div className="result-grid">
-              <div>
-                <span>{t.bonus}</span>
-                <strong>{review.bonusPercent}%</strong>
+            {!isRejected && (
+              <div className="result-grid">
+                <div>
+                  <span>{t.bonus}</span>
+                  <strong>{review.bonusPercent}%</strong>
+                </div>
+                <div>
+                  <span>{t.coupon}</span>
+                  <strong>{review.couponCode ?? '-'}</strong>
+                </div>
               </div>
-              <div>
-                <span>{t.coupon}</span>
-                <strong>{review.couponCode ?? '-'}</strong>
+            )}
+            {!isRejected && Object.keys(breakdown).length > 0 && (
+              <div className="modal-suggestions">
+                {Object.entries(breakdown).map(([key, value]) => (
+                  <span key={key}>{t[key] ?? key}: {value}/20</span>
+                ))}
               </div>
-            </div>
-            <p className="muted">{hasBonus ? t.whyGood : t.improve}</p>
+            )}
+            {!isRejected && explanation && <p className="muted">{explanation}</p>}
             {suggestions.length > 0 && (
               <div className="modal-suggestions">
                 {suggestions.slice(0, 3).map((suggestion) => (
@@ -887,8 +1007,8 @@ function ResultModal({ t, review, processing, processingStep, language, onClose,
                 ))}
               </div>
             )}
-            <button type="button" className="primary-button" onClick={onFeed}>
-              {t.goFeed}
+            <button type="button" className="primary-button" onClick={isRejected ? onClose : onFeed}>
+              {isRejected ? t.close : t.goFeed}
               <ChevronRight size={18} />
             </button>
           </>
@@ -924,7 +1044,10 @@ function ReviewCard({ t, language, review, liked, onHelpful }) {
           <strong>{getAuthorName(review)}</strong>
           <span>{labelOf(optionById(CATEGORY_OPTIONS, review.category), language)} · {getReviewPlace(review, language)}</span>
         </div>
-        <div className="score-badge">{review.score}</div>
+        <div className="score-badge">
+          <small>{t.aiQualityScore}</small>
+          {review.score}
+        </div>
       </div>
       <div className="review-meta">
         <span>{getReviewItem(review, language)}</span>
@@ -1021,7 +1144,7 @@ function LeaderboardScreen({ t, reviewers }) {
   )
 }
 
-function DashboardScreen({ t, dashboard, categoryCounts, complaints, praises, topReviews, language }) {
+function DashboardScreen({ t, dashboard, categoryCounts, complaints, praises, topReviews, aiInsight, language }) {
   return (
     <div className="stack">
       <ScreenTitle title={t.dashboard} subtitle={t.activityOverview} />
@@ -1036,11 +1159,15 @@ function DashboardScreen({ t, dashboard, categoryCounts, complaints, praises, to
       <InsightList title={t.complaints} items={complaints} />
       <InsightList title={t.praised} items={praises} />
       <section className="panel stack">
+        <h2>{t.aiInsight}</h2>
+        <p className="muted">{aiInsight}</p>
+      </section>
+      <section className="panel stack">
         <h2>{t.topUseful}</h2>
         {topReviews.map((review) => (
           <div key={review.id} className="compact-review">
             <strong>{getReviewItem(review, language)}</strong>
-            <span>{labelOf(optionById(CATEGORY_OPTIONS, review.category), language)} · {review.score}/100</span>
+            <span>{labelOf(optionById(CATEGORY_OPTIONS, review.category), language)} · {t.aiQualityScore}: {review.score}/100</span>
           </div>
         ))}
       </section>
